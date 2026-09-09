@@ -56,7 +56,7 @@
 
   <script>
     // MASUKKAN ID SPREADSHEET ANDA DI SINI
-    const SHEET_ID = '1A4xCPByCydWjU5E8FsckHyXrRy3UPZFjsGlx86NdVY4'; // Ganti dengan ID asli Anda
+    const SHEET_ID = '1A4xCPByCydWjU5E8FsckHyXrRy3UPZFjsGlx86NdVY4'; 
     const TAB_NAME = 'GUDANG'; 
 
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${TAB_NAME}&tqx=out:json`;
@@ -71,26 +71,35 @@
         const tbody = document.getElementById("tabel-body-kir");
         let htmlTabel = "";
 
-        // Lewati baris pertama jika itu adalah baris Judul di Google Sheets (ubah jadi let i = 0 jika tidak ada judul)
-        for(let i = 1; i < barisData.length; i++) {
+        // Ubah i = 1 menjadi i = 0 agar membaca dari data urutan pertama
+        for(let i = 0; i < barisData.length; i++) {
           const kolom = barisData[i].c;
           
-          if (!kolom || !kolom[0] || !kolom[0].v) continue; // Hentikan jika kolom "No." kosong
+          if (!kolom) continue; // Pastikan baris memiliki data
 
-          // Memetakan 13 Kolom sesuai urutan pada Header
-          const no = kolom[0] ? kolom[0].v : "";
-          const nama = kolom[1] ? kolom[1].v : "";
-          const merek = kolom[2] ? kolom[2].v : "";
-          const seri = kolom[3] ? kolom[3].v : "";
-          const ukuran = kolom[4] ? kolom[4].v : "";
-          const bahan = kolom[5] ? kolom[5].v : "";
-          const tahun = kolom[6] ? kolom[6].v : "";
-          const kode = kolom[7] ? kolom[7].v : "";
-          const harga = kolom[8] ? (kolom[8].f ? kolom[8].f : kolom[8].v) : ""; // .f menarik format angka/rupiah asli Excel
-          const b = kolom[9] ? kolom[9].v : "";
-          const kb = kolom[10] ? kolom[10].v : "";
-          const rb = kolom[11] ? kolom[11].v : "";
-          const ket = kolom[12] ? kolom[12].v : "";
+          // Membaca sel dengan aman (tidak error meski sel di Excel kosong)
+          const no = (kolom[0] && kolom[0].v !== null) ? kolom[0].v : "";
+          const nama = (kolom[1] && kolom[1].v !== null) ? kolom[1].v : "";
+          const merek = (kolom[2] && kolom[2].v !== null) ? kolom[2].v : "";
+          const seri = (kolom[3] && kolom[3].v !== null) ? kolom[3].v : "";
+          const ukuran = (kolom[4] && kolom[4].v !== null) ? kolom[4].v : "";
+          const bahan = (kolom[5] && kolom[5].v !== null) ? kolom[5].v : "";
+          const tahun = (kolom[6] && kolom[6].v !== null) ? kolom[6].v : "";
+          const kode = (kolom[7] && kolom[7].v !== null) ? kolom[7].v : "";
+          
+          // Mengambil harga (prioritaskan format teks Excel .f agar rapi)
+          let harga = "";
+          if (kolom[8]) {
+            harga = kolom[8].f ? kolom[8].f : (kolom[8].v !== null ? kolom[8].v : "");
+          }
+
+          const b = (kolom[9] && kolom[9].v !== null) ? kolom[9].v : "";
+          const kb = (kolom[10] && kolom[10].v !== null) ? kolom[10].v : "";
+          const rb = (kolom[11] && kolom[11].v !== null) ? kolom[11].v : "";
+          const ket = (kolom[12] && kolom[12].v !== null) ? kolom[12].v : "";
+
+          // Jika Nomor dan Nama Barang kosong, lewati (mencegah baris hantu ditarik ke tabel)
+          if (no === "" && nama === "") continue; 
 
           htmlTabel += `
             <tr>
@@ -111,6 +120,7 @@
           `;
         }
 
+        // Tampilkan tabel ke HTML
         tbody.innerHTML = htmlTabel;
         document.getElementById('status-loading').style.display = 'none';
         document.getElementById('tabel-utama').style.display = 'table';
