@@ -2,133 +2,300 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>KIR Dinamis SI-ASEP - Auto Sync Google Sheets</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KIR Dinamis SI-ASEP - Satpol PP Kota Serang</title>
+  
   <style>
-    /* Desain Tabel Standar KIR */
-    body { font-family: 'Arial', sans-serif; padding: 20px; font-size: 11px; background: #f1f5f9; }
-    .kertas-a4 { background: #fff; max-width: 1000px; margin: 0 auto; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .header-kir { text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 20px; text-decoration: underline; }
+    /* RESET & BASE STYLES */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 30px; }
+
+    /* HEADER BERSAMA LOGO */
+    .site-header {
+      background: #ffffff;
+      border-bottom: 3px solid #0284c7;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    .logo-box img { max-height: 60px; width: auto; }
+    .header-title { text-align: center; flex: 1; padding: 0 10px; }
+    .header-title h1 { font-size: 1.2rem; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
+    .header-title p { font-size: 0.85rem; color: #64748b; font-weight: bold; }
+
+    /* KONTROL UTAMA (NAVIGASI & PENCARIAN) */
+    .kontrol-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    .tabel-barang { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .tabel-barang th, .tabel-barang td { border: 1px solid #000; padding: 6px; vertical-align: top; }
-    .tabel-barang th { background-color: #f8fafc; font-weight: bold; text-align: center; vertical-align: middle; }
+    .nav-ruangan {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+      justify-content: center;
+    }
+    .btn-nav {
+      background: #1e293b; color: #fff; border: none; padding: 8px 16px;
+      border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    }
+    .btn-nav:hover { background: #0284c7; }
+    .btn-nav.active { background: #d97706; box-shadow: 0 4px 10px rgba(217,119,6,0.3); }
+
+    .toolbar-aksi {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+    .toolbar-aksi h2 { font-size: 1.1rem; color: #0284c7; }
+    
+    .search-box {
+      display: flex; align-items: center; width: 100%; max-width: 350px;
+    }
+    .search-box input {
+      width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1;
+      border-radius: 20px; outline: none; font-size: 0.9rem; transition: 0.3s;
+    }
+    .search-box input:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
+
+    /* TABEL RESPONSIF */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto; /* Kunci agar bisa digeser di HP */
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .tabel-barang { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 11px; }
+    .tabel-barang th, .tabel-barang td { border: 1px solid #cbd5e1; padding: 8px; vertical-align: middle; }
+    .tabel-barang th { background-color: #f8fafc; font-weight: bold; text-align: center; }
+    .tabel-barang tr:nth-child(even) { background-color: #f1f5f9; }
+    .tabel-barang tr:hover { background-color: #e0f2fe; }
     
     .text-center { text-align: center; }
     .text-right { text-align: right; }
-    
-    /* Animasi Loading */
-    #status-loading { text-align: center; padding: 20px; font-weight: bold; color: #0284c7; }
+
+    #status-loading { text-align: center; padding: 30px; font-weight: bold; color: #0284c7; font-size: 1rem; }
+
+    /* RESPONSIVE LAYOUT (HP) */
+    @media (max-width: 600px) {
+      .site-header { padding: 10px; }
+      .logo-box img { max-height: 45px; }
+      .header-title h1 { font-size: 0.95rem; }
+      .header-title p { font-size: 0.7rem; }
+      .nav-ruangan { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 5px; }
+      .btn-nav { white-space: nowrap; font-size: 0.8rem; padding: 6px 12px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="kertas-a4">
-    <div class="header-kir">KARTU INVENTARIS RUANGAN (GUDANG)</div>
+  <!-- HEADER DENGAN LOGO -->
+  <header class="site-header">
+    <div class="logo-box">
+      <!-- Pastikan file logo tersedia di folder yang sama -->
+      <img src="kotaserang.png" alt="Logo Serang">
+    </div>
+    <div class="header-title">
+      <h1>KARTU INVENTARIS RUANGAN</h1>
+      <p>Satuan Polisi Pamong Praja Kota Serang</p>
+    </div>
+    <div class="logo-box">
+      <img src="polpp.png" alt="Logo Satpol PP">
+    </div>
+  </header>
 
-    <div id="status-loading">🔄 Sedang mengambil data terbaru dari Google Sheets...</div>
+  <div class="kontrol-container">
+    
+    <!-- TOMBOL NAVIGASI RUANGAN -->
+    <div class="nav-ruangan" id="navigasi-ruangan">
+      <!-- Tambahkan atau ubah nama ruangan sesuai nama Tab (Sheet) di Google Sheets Anda -->
+      <button class="btn-nav active" onclick="gantiRuangan('GUDANG', this)">GUDANG</button>
+      <button class="btn-nav" onclick="gantiRuangan('KASAT', this)">KASAT</button>
+      <button class="btn-nav" onclick="gantiRuangan('UMPEG', this)">UMPEG</button>
+      <button class="btn-nav" onclick="gantiRuangan('KEUANGAN', this)">KEUANGAN</button>
+      <button class="btn-nav" onclick="gantiRuangan('SEKRETARIS', this)">SEKRETARIS</button>
+      <button class="btn-nav" onclick="gantiRuangan('TRANTIBUM', this)">TRANTIBUM</button>
+    </div>
 
-    <table class="tabel-barang" id="tabel-utama" style="display: none;">
-      <thead>
-        <tr>
-          <th rowspan="2">No.</th>
-          <th rowspan="2">Jenis Barang/ Nama Barang</th>
-          <th rowspan="2">Merek/ Model</th>
-          <th rowspan="2">No. Seri Pabrik</th>
-          <th rowspan="2">Ukuran</th>
-          <th rowspan="2">Bahan</th>
-          <th rowspan="2">Tahun Pembuatan/<br>Pembelian</th>
-          <th rowspan="2">No. Kode Barang</th>
-          <th rowspan="2">Harga Beli/<br>Perolehan</th>
-          <th colspan="3">Keadaan Barang</th>
-          <th rowspan="2">Keterangan</th>
-        </tr>
-        <tr>
-          <th>Baik<br>(B)</th>
-          <th>Kurang<br>Baik<br>(KB)</th>
-          <th>Rusak<br>Berat<br>(RB)</th>
-        </tr>
-      </thead>
-      <tbody id="tabel-body-kir">
-        <!-- Baris data disuntikkan ke sini -->
-      </tbody>
-    </table>
+    <!-- PENCARIAN & JUDUL TABEL -->
+    <div class="toolbar-aksi">
+      <h2 id="judul-ruangan">📍 Ruangan: GUDANG</h2>
+      <div class="search-box">
+        <input type="text" id="inputPencarian" placeholder="🔍 Cari Barang, Merek, atau Kode..." onkeyup="cariDataBarang()">
+      </div>
+    </div>
+
+    <div id="status-loading">🔄 Menarik Data dari Database...</div>
+
+    <!-- WADAH TABEL (BISA DI-SCROLL DI HP) -->
+    <div class="table-responsive">
+      <table class="tabel-barang" id="tabel-utama" style="display: none;">
+        <thead>
+          <tr>
+            <th rowspan="2" width="3%">No.</th>
+            <th rowspan="2" width="18%">Jenis Barang / Nama Barang</th>
+            <th rowspan="2" width="12%">Merek / Model</th>
+            <th rowspan="2" width="8%">No. Seri Pabrik</th>
+            <th rowspan="2" width="6%">Ukuran</th>
+            <th rowspan="2" width="6%">Bahan</th>
+            <th rowspan="2" width="5%">Tahun</th>
+            <th rowspan="2" width="10%">No. Kode Barang</th>
+            <th rowspan="2" width="9%">Harga Beli</th>
+            <th colspan="3">Keadaan</th>
+            <th rowspan="2" width="10%">Keterangan</th>
+          </tr>
+          <tr>
+            <th width="4%">B</th>
+            <th width="4%">KB</th>
+            <th width="4%">RB</th>
+          </tr>
+        </thead>
+        <tbody id="tabel-body-kir">
+          <!-- Data Hasil Fetch / Pencarian -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    // MASUKKAN ID SPREADSHEET ANDA DI SINI
+    // ID SPREADSHEET (Tetap sama)
     const SHEET_ID = '1A4xCPByCydWjU5E8FsckHyXrRy3UPZFjsGlx86NdVY4'; 
-    const TAB_NAME = 'GUDANG'; 
+    
+    // Variabel Global untuk menyimpan data mentah ruangan saat ini
+    let dataBarangAktif = []; 
 
-    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${TAB_NAME}&tqx=out:json`;
+    // Fungsi Mengganti Ruangan
+    function gantiRuangan(namaTab, elemenTombol) {
+      // 1. Ubah warna tombol aktif
+      const tombolSemua = document.querySelectorAll('.btn-nav');
+      tombolSemua.forEach(btn => btn.classList.remove('active'));
+      elemenTombol.classList.add('active');
 
-    fetch(URL)
-      .then(res => res.text())
-      .then(text => {
-        const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-        const data = JSON.parse(jsonString);
-        
-        const barisData = data.table.rows;
-        const tbody = document.getElementById("tabel-body-kir");
-        let htmlTabel = "";
+      // 2. Ubah Judul
+      document.getElementById('judul-ruangan').innerText = `📍 Ruangan: ${namaTab}`;
+      
+      // 3. Reset Pencarian
+      document.getElementById('inputPencarian').value = '';
 
-        // Ubah i = 1 menjadi i = 0 agar membaca dari data urutan pertama
-        for(let i = 0; i < barisData.length; i++) {
-          const kolom = barisData[i].c;
+      // 4. Tarik data dari Tab tersebut
+      tarikDataSheets(namaTab);
+    }
+
+    // Fungsi Utama Menarik Data Google Sheets
+    function tarikDataSheets(namaTab) {
+      document.getElementById('tabel-utama').style.display = 'none';
+      document.getElementById('status-loading').style.display = 'block';
+      document.getElementById('status-loading').innerText = `🔄 Menarik Data Ruangan ${namaTab}...`;
+      
+      const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${namaTab}&tqx=out:json`;
+
+      fetch(URL)
+        .then(res => res.text())
+        .then(text => {
+          const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+          const data = JSON.parse(jsonString);
+          const barisData = data.table.rows;
           
-          if (!kolom) continue; // Pastikan baris memiliki data
+          dataBarangAktif = []; // Kosongkan data lama
 
-          // Membaca sel dengan aman (tidak error meski sel di Excel kosong)
-          const no = (kolom[0] && kolom[0].v !== null) ? kolom[0].v : "";
-          const nama = (kolom[1] && kolom[1].v !== null) ? kolom[1].v : "";
-          const merek = (kolom[2] && kolom[2].v !== null) ? kolom[2].v : "";
-          const seri = (kolom[3] && kolom[3].v !== null) ? kolom[3].v : "";
-          const ukuran = (kolom[4] && kolom[4].v !== null) ? kolom[4].v : "";
-          const bahan = (kolom[5] && kolom[5].v !== null) ? kolom[5].v : "";
-          const tahun = (kolom[6] && kolom[6].v !== null) ? kolom[6].v : "";
-          const kode = (kolom[7] && kolom[7].v !== null) ? kolom[7].v : "";
-          
-          // Mengambil harga (prioritaskan format teks Excel .f agar rapi)
-          let harga = "";
-          if (kolom[8]) {
-            harga = kolom[8].f ? kolom[8].f : (kolom[8].v !== null ? kolom[8].v : "");
+          // Proses baris per baris
+          for(let i = 0; i < barisData.length; i++) {
+            const kolom = barisData[i].c;
+            if (!kolom) continue;
+
+            const no = (kolom[0] && kolom[0].v !== null) ? String(kolom[0].v) : "";
+            const nama = (kolom[1] && kolom[1].v !== null) ? String(kolom[1].v) : "";
+            if (no === "" && nama === "") continue; 
+
+            // Simpan ke dalam array Object
+            dataBarangAktif.push({
+              no: no,
+              nama: nama,
+              merek: (kolom[2] && kolom[2].v !== null) ? String(kolom[2].v) : "",
+              seri: (kolom[3] && kolom[3].v !== null) ? String(kolom[3].v) : "",
+              ukuran: (kolom[4] && kolom[4].v !== null) ? String(kolom[4].v) : "",
+              bahan: (kolom[5] && kolom[5].v !== null) ? String(kolom[5].v) : "",
+              tahun: (kolom[6] && kolom[6].v !== null) ? String(kolom[6].v) : "",
+              kode: (kolom[7] && kolom[7].v !== null) ? String(kolom[7].v) : "",
+              harga: kolom[8] ? (kolom[8].f ? kolom[8].f : (kolom[8].v !== null ? String(kolom[8].v) : "")) : "",
+              b: (kolom[9] && kolom[9].v !== null) ? String(kolom[9].v) : "",
+              kb: (kolom[10] && kolom[10].v !== null) ? String(kolom[10].v) : "",
+              rb: (kolom[11] && kolom[11].v !== null) ? String(kolom[11].v) : "",
+              ket: (kolom[12] && kolom[12].v !== null) ? String(kolom[12].v) : ""
+            });
           }
 
-          const b = (kolom[9] && kolom[9].v !== null) ? kolom[9].v : "";
-          const kb = (kolom[10] && kolom[10].v !== null) ? kolom[10].v : "";
-          const rb = (kolom[11] && kolom[11].v !== null) ? kolom[11].v : "";
-          const ket = (kolom[12] && kolom[12].v !== null) ? kolom[12].v : "";
+          // Tampilkan tabel awal (tanpa filter)
+          renderTabelHTML(dataBarangAktif);
+        })
+        .catch(error => {
+          document.getElementById('status-loading').innerHTML = `❌ Gagal mengambil data Ruangan ${namaTab}. Pastikan nama Tab di Excel ejaan dan spasinya sama persis.`;
+          console.error("Error:", error);
+        });
+    }
 
-          // Jika Nomor dan Nama Barang kosong, lewati (mencegah baris hantu ditarik ke tabel)
-          if (no === "" && nama === "") continue; 
+    // Fungsi Render HTML Tabel
+    function renderTabelHTML(arrayData) {
+      const tbody = document.getElementById("tabel-body-kir");
+      let htmlTabel = "";
 
+      if (arrayData.length === 0) {
+        htmlTabel = `<tr><td colspan="13" class="text-center" style="padding:20px; font-weight:bold; color:red;">Barang tidak ditemukan di ruangan ini.</td></tr>`;
+      } else {
+        arrayData.forEach(item => {
           htmlTabel += `
             <tr>
-              <td class="text-center">${no}</td>
-              <td>${nama}</td>
-              <td>${merek}</td>
-              <td>${seri}</td>
-              <td>${ukuran}</td>
-              <td>${bahan}</td>
-              <td class="text-center">${tahun}</td>
-              <td class="text-center">${kode}</td>
-              <td class="text-right">${harga}</td>
-              <td class="text-center">${b}</td>
-              <td class="text-center">${kb}</td>
-              <td class="text-center">${rb}</td>
-              <td>${ket}</td>
+              <td class="text-center">${item.no}</td>
+              <td><strong>${item.nama}</strong></td>
+              <td>${item.merek}</td>
+              <td>${item.seri}</td>
+              <td>${item.ukuran}</td>
+              <td>${item.bahan}</td>
+              <td class="text-center">${item.tahun}</td>
+              <td class="text-center">${item.kode}</td>
+              <td class="text-right">${item.harga}</td>
+              <td class="text-center">${item.b}</td>
+              <td class="text-center">${item.kb}</td>
+              <td class="text-center">${item.rb}</td>
+              <td>${item.ket}</td>
             </tr>
           `;
-        }
+        });
+      }
 
-        // Tampilkan tabel ke HTML
-        tbody.innerHTML = htmlTabel;
-        document.getElementById('status-loading').style.display = 'none';
-        document.getElementById('tabel-utama').style.display = 'table';
-      })
-      .catch(error => {
-        document.getElementById('status-loading').innerHTML = "❌ Gagal mengambil data. Pastikan ID Spreadsheet benar dan akses URL dibagikan ke Publik.";
-        console.error("Error:", error);
+      tbody.innerHTML = htmlTabel;
+      document.getElementById('status-loading').style.display = 'none';
+      document.getElementById('tabel-utama').style.display = 'table';
+    }
+
+    // Fungsi Fitur Pencarian Cerdas Instan (Search Bar)
+    function cariDataBarang() {
+      const kataKunci = document.getElementById('inputPencarian').value.toLowerCase();
+      
+      // Filter array data mentah berdasarkan kecocokan nama, merek, atau kode register
+      const hasilPencarian = dataBarangAktif.filter(item => {
+        return item.nama.toLowerCase().includes(kataKunci) || 
+               item.kode.toLowerCase().includes(kataKunci) ||
+               item.merek.toLowerCase().includes(kataKunci);
       });
+
+      // Cetak ulang tabel hanya dengan hasil pencarian
+      renderTabelHTML(hasilPencarian);
+    }
+
+    // Tarik data Ruangan GUDANG otomatis saat web pertama kali dibuka
+    window.onload = function() {
+      tarikDataSheets('GUDANG');
+    };
   </script>
 
 </body>
