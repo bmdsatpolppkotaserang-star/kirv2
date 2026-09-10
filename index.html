@@ -35,18 +35,72 @@
     /* KONTROL UTAMA (NAVIGASI & PENCARIAN) */
     .kontrol-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    .nav-ruangan {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; justify-content: center;
-      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+    /* =========================================
+       HAMBURGER MENU STYLES
+       ========================================= */
+    .menu-container {
+      position: relative;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-    .btn-nav {
-      background: #1e293b; color: #fff; border: none; padding: 10px 18px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-      font-size: 0.85rem; letter-spacing: 0.5px;
-    }
-    .btn-nav:hover { background: #0284c7; }
-    .btn-nav.active { background: #d97706; box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
 
+    .hamburger-btn {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.3s;
+    }
+    .hamburger-btn:hover { background: #0369a1; }
+    
+    /* Indikator Ruangan Aktif di samping Hamburger */
+    .ruangan-aktif-label {
+      font-weight: bold;
+      color: #0f172a;
+      font-size: 1rem;
+    }
+
+    .dropdown-nav {
+      display: none; /* Disembunyikan secara default */
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      z-index: 999;
+      margin-top: 5px;
+      padding: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    
+    .dropdown-nav.show { display: grid; } /* Ditampilkan saat hamburger diklik */
+
+    .btn-nav {
+      background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 10px;
+      border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+      font-size: 0.85rem; text-align: center; width: 100%;
+    }
+    .btn-nav:hover { background: #e2e8f0; }
+    .btn-nav.active { background: #0284c7; color: white; border-color: #0284c7; }
+
+    /* TOOLBAR PENCARIAN */
     .toolbar-aksi {
       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
       background: #fff; padding: 15px 20px; border-radius: 10px;
@@ -86,37 +140,17 @@
 
     #status-loading { text-align: center; padding: 40px 20px; font-weight: bold; color: #0284c7; font-size: 0.95rem; background: #fff; border-radius: 10px; margin-bottom: 15px; }
 
-    /* =========================================
-       RESPONSIVE LAYOUT KHUSUS HP (UI/UX FIX)
-       ========================================= */
+    /* RESPONSIVE LAYOUT KHUSUS HP */
     @media (max-width: 600px) {
-      .site-header { 
-        padding: 12px 10px; 
-        gap: 6px; 
-      }
-      /* Pengecilan logo agar teks tidak tergencet */
+      .site-header { padding: 12px 10px; gap: 6px; }
       .logo-box img { max-height: 42px; }
-      
-      /* Merapikan teks header */
       .header-title { padding: 0; }
       .header-title h1 { font-size: 0.9rem; line-height: 1.2; margin-bottom: 2px; }
       .header-title p { font-size: 0.7rem; line-height: 1.2; }
 
-      /* Navigasi mulus tanpa scrollbar */
-      .nav-ruangan { 
-        justify-content: flex-start; 
-        flex-wrap: nowrap; 
-        overflow-x: auto; 
-        padding-bottom: 5px; 
-        margin-bottom: 10px;
-        -ms-overflow-style: none; /* IE & Edge */
-        scrollbar-width: none; /* Firefox */
-      }
-      .nav-ruangan::-webkit-scrollbar { display: none; /* Chrome, Safari */ }
-      
-      .btn-nav { white-space: nowrap; padding: 8px 14px; font-size: 0.8rem; }
+      .menu-container { flex-direction: row; }
+      .dropdown-nav { grid-template-columns: repeat(2, 1fr); } /* 2 kolom tombol di HP */
 
-      /* Search bar penuh 100% di HP */
       .toolbar-aksi { flex-direction: column; align-items: flex-start; padding: 12px 15px; gap: 12px; }
       .search-box { max-width: 100%; }
       .toolbar-aksi h2 { font-size: 1rem; }
@@ -141,22 +175,33 @@
   </header>
 
   <div class="kontrol-container">
-    <div class="nav-ruangan" id="navigasi-ruangan">
-      <button class="btn-nav active" onclick="gantiRuangan('KASAT', this)">KASAT</button>
-      <button class="btn-nav" onclick="gantiRuangan('SEKRETARIS', this)">SEKRETARIS</button>
-      <button class="btn-nav" onclick="gantiRuangan('UMPEG', this)">UMPEG</button>
-      <button class="btn-nav" onclick="gantiRuangan('KEUANGAN', this)">KEUANGAN</button>
-      <button class="btn-nav" onclick="gantiRuangan('GUDANG', this)">GUDANG</button>
-      <button class="btn-nav" onclick="gantiRuangan('TRANTIBUM', this)">TRANTIBUM</button>
-      <button class="btn-nav" onclick="gantiRuangan('PEP', this)">PEP</button>
-      <button class="btn-nav" onclick="gantiRuangan('LINMAS', this)">LINMAS</button>
-      <button class="btn-nav" onclick="gantiRuangan('RAPAT', this)">RAPAT</button>
-      <button class="btn-nav" onclick="gantiRuangan('PPNS', this)">PPNS</button>
-      <button class="btn-nav" onclick="gantiRuangan('ASET', this)">ASET</button>
-      <button class="btn-nav" onclick="gantiRuangan('DALOPS', this)">DALOPS</button>
-      <button class="btn-nav" onclick="gantiRuangan('RESEPSIONIS', this)">RESEPSIONIS</button>
+    
+    <!-- HAMBURGER MENU AREA -->
+    <div class="menu-container">
+      <button class="hamburger-btn" onclick="toggleMenu()">
+        ☰ Pilih Ruangan
+      </button>
+      <div class="ruangan-aktif-label" id="label-ruangan-atas">GUDANG</div>
+
+      <!-- Dropdown Navigasi -->
+      <div class="dropdown-nav" id="dropdown-menu">
+        <button class="btn-nav" onclick="gantiRuangan('KASAT', this)">KASAT</button>
+        <button class="btn-nav" onclick="gantiRuangan('SEKRETARIS', this)">SEKRETARIS</button>
+        <button class="btn-nav" onclick="gantiRuangan('UMPEG', this)">UMPEG</button>
+        <button class="btn-nav" onclick="gantiRuangan('KEUANGAN', this)">KEUANGAN</button>
+        <button class="btn-nav active" onclick="gantiRuangan('GUDANG', this)">GUDANG</button>
+        <button class="btn-nav" onclick="gantiRuangan('TRANTIBUM', this)">TRANTIBUM</button>
+        <button class="btn-nav" onclick="gantiRuangan('PEP', this)">PEP</button>
+        <button class="btn-nav" onclick="gantiRuangan('LINMAS', this)">LINMAS</button>
+        <button class="btn-nav" onclick="gantiRuangan('RAPAT', this)">RAPAT</button>
+        <button class="btn-nav" onclick="gantiRuangan('PPNS', this)">PPNS</button>
+        <button class="btn-nav" onclick="gantiRuangan('ASET', this)">ASET</button>
+        <button class="btn-nav" onclick="gantiRuangan('DALOPS', this)">DALOPS</button>
+        <button class="btn-nav" onclick="gantiRuangan('RESEPSIONIS', this)">RESEPSIONIS</button>
+      </div>
     </div>
 
+    <!-- PENCARIAN & JUDUL TABEL -->
     <div class="toolbar-aksi">
       <h2 id="judul-ruangan">📍 KASAT</h2>
       <div class="search-box">
@@ -199,12 +244,36 @@
     const SHEET_ID = '1A4xCPByCydWjU5E8FsckHyXrRy3UPZFjsGlx86NdVY4'; 
     let dataBarangAktif = []; 
 
+    // Fungsi Buka/Tutup Hamburger Menu
+    function toggleMenu() {
+      document.getElementById("dropdown-menu").classList.toggle("show");
+    }
+
+    // Menutup menu jika user mengklik di luar area menu
+    window.onclick = function(event) {
+      if (!event.target.matches('.hamburger-btn')) {
+        const dropdowns = document.getElementsByClassName("dropdown-nav");
+        for (let i = 0; i < dropdowns.length; i++) {
+          let openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    }
+
     function gantiRuangan(namaTab, elemenTombol) {
       const tombolSemua = document.querySelectorAll('.btn-nav');
       tombolSemua.forEach(btn => btn.classList.remove('active'));
       elemenTombol.classList.add('active');
+      
+      document.getElementById('label-ruangan-atas').innerText = namaTab;
       document.getElementById('judul-ruangan').innerText = `📍 ${namaTab}`;
       document.getElementById('inputPencarian').value = '';
+      
+      // Tutup menu setelah memilih ruangan
+      document.getElementById("dropdown-menu").classList.remove("show");
+      
       tarikDataSheets(namaTab);
     }
 
