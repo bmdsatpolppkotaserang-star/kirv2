@@ -7,37 +7,37 @@
   
   <style>
     /* RESET & BASE STYLES */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
-    body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 30px; -webkit-font-smoothing: antialiased; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 40px; -webkit-font-smoothing: antialiased; }
 
-    /* HEADER BERSAMA LOGO (STICKY DI ATAS HALAMAN) */
+    /* HEADER BERSAMA LOGO (GLASSMORPHISM STICKY) */
     .site-header {
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-bottom: 3px solid #0284c7;
-      padding: 15px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      gap: 10px;
+      gap: 12px;
     }
     .logo-box { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .logo-box img { max-height: 60px; width: auto; object-fit: contain; }
+    .logo-box img { max-height: 55px; width: auto; object-fit: contain; }
     
-    .header-title { text-align: center; flex: 1; padding: 0 5px; min-width: 0; }
-    .header-title h1 { font-size: 1.25rem; font-weight: 900; color: #0f172a; margin-bottom: 4px; line-height: 1.2; }
-    .header-title p { font-size: 0.9rem; color: #64748b; font-weight: 700; line-height: 1.3; }
+    .header-title { text-align: center; flex: 1; padding: 0; min-width: 0; }
+    .header-title h1 { font-size: clamp(1.05rem, 3vw, 1.3rem); font-weight: 900; color: #0f172a; margin-bottom: 4px; line-height: 1.2; letter-spacing: -0.5px; }
+    .header-title p { font-size: clamp(0.75rem, 2vw, 0.9rem); color: #475569; font-weight: 700; line-height: 1.3; }
 
-    /* KONTROL UTAMA (NAVIGASI & PENCARIAN) */
+    /* KONTROL UTAMA */
     .kontrol-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    /* =========================================
-       HAMBURGER MENU STYLES
-       ========================================= */
+    /* HAMBURGER MENU STYLES */
     .menu-container {
       position: relative;
       margin-bottom: 15px;
@@ -45,117 +45,126 @@
       justify-content: space-between;
       align-items: center;
       background: #fff;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border: 1px solid #e2e8f0;
     }
 
     .hamburger-btn {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.3s;
+      background: #0284c7; color: white; border: none; padding: 10px 16px;
+      border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
     }
-    .hamburger-btn:hover { background: #0369a1; }
+    .hamburger-btn:hover { background: #0369a1; transform: translateY(-1px); }
+    .hamburger-btn:active { transform: translateY(0); }
     
-    /* Indikator Ruangan Aktif di samping Hamburger */
-    .ruangan-aktif-label {
-      font-weight: bold;
-      color: #0f172a;
-      font-size: 1rem;
-    }
+    .ruangan-aktif-label { font-weight: 800; color: #0f172a; font-size: 1.05rem; letter-spacing: 0.5px; }
 
+    /* MENU DROPDOWN DENGAN ANIMASI */
     .dropdown-nav {
-      display: none; /* Disembunyikan secara default */
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-15px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: absolute;
-      top: 100%;
+      top: calc(100% + 8px);
       left: 0;
       width: 100%;
       background: #ffffff;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border-radius: 12px;
       border: 1px solid #e2e8f0;
       z-index: 999;
-      margin-top: 5px;
-      padding: 10px;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 8px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
     }
-    
-    .dropdown-nav.show { display: grid; } /* Ditampilkan saat hamburger diklik */
+    .dropdown-nav.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
     .btn-nav {
-      background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 10px;
-      border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+      background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; padding: 10px;
+      border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;
       font-size: 0.85rem; text-align: center; width: 100%;
     }
-    .btn-nav:hover { background: #e2e8f0; }
-    .btn-nav.active { background: #0284c7; color: white; border-color: #0284c7; }
+    .btn-nav:hover { background: #f1f5f9; border-color: #94a3b8; color: #0f172a; }
+    .btn-nav.active { background: #0284c7; color: white; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); }
 
     /* TOOLBAR PENCARIAN */
     .toolbar-aksi {
       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-      background: #fff; padding: 15px 20px; border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 15px; gap: 15px;
+      background: #fff; padding: 15px 20px; border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom: 20px; gap: 15px;
     }
-    .toolbar-aksi h2 { font-size: 1.1rem; color: #0f172a; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .toolbar-aksi h2 { font-size: 1.15rem; color: #0f172a; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0; }
     
-    .search-box { display: flex; align-items: center; width: 100%; max-width: 350px; position: relative; }
+    .search-box { position: relative; display: flex; align-items: center; width: 100%; max-width: 350px; }
     .search-box input {
-      width: 100%; padding: 10px 15px 10px 35px; border: 1px solid #cbd5e1;
-      border-radius: 20px; outline: none; font-size: 0.9rem; transition: 0.3s;
-      background: #f8fafc;
+      width: 100%; padding: 12px 15px 12px 42px; border: 1px solid #cbd5e1;
+      border-radius: 25px; outline: none; font-size: 0.95rem; transition: all 0.3s;
+      background: #f8fafc; color: #1e293b;
     }
-    .search-box input:focus { border-color: #0284c7; background: #fff; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
-    .search-icon { position: absolute; left: 12px; font-size: 1rem; color: #94a3b8; pointer-events: none; }
+    .search-box input:focus { border-color: #0284c7; background: #fff; box-shadow: 0 0 0 4px rgba(2,132,199,0.1); }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #94a3b8; pointer-events: none; }
 
-    /* TABEL RESPONSIF DENGAN HEADER STICKY */
+    /* TABEL RESPONSIF & PREMIUM */
     .table-responsive {
-      width: 100%; max-height: 65vh; overflow-y: auto; overflow-x: auto;
-      background: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      width: 100%; max-height: 68vh; overflow-y: auto; overflow-x: auto;
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
       -webkit-overflow-scrolling: touch;
     }
     
-    .tabel-barang { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; font-size: 11px; }
-    .tabel-barang thead { position: sticky; top: 0; z-index: 100; background-color: #f8fafc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .tabel-barang th, .tabel-barang td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 10px 8px; vertical-align: middle; }
-    .tabel-barang th:first-child, .tabel-barang td:first-child { border-left: 1px solid #e2e8f0; }
+    .tabel-barang { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; font-size: 11.5px; }
     
-    .tabel-barang th { background-color: #f8fafc; font-weight: bold; text-align: center; border-top: 1px solid #e2e8f0; color: #334155; }
-    .tabel-barang thead tr:nth-child(2) th { border-top: none; }
+    /* Header Tabel Gelap Premium */
+    .tabel-barang thead { position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+    .tabel-barang th { 
+      background-color: #0f172a; /* Warna Navy Gelap */
+      color: #f8fafc; /* Teks Putih */
+      font-weight: 700; text-align: center; border-bottom: 1px solid #1e293b; border-right: 1px solid #1e293b; 
+      padding: 12px 8px; letter-spacing: 0.3px; text-transform: uppercase; font-size: 10.5px;
+    }
+    .tabel-barang th:first-child { border-left: 1px solid #1e293b; }
+    .tabel-barang thead tr:nth-child(2) th { background-color: #1e293b; /* Baris kedua sedikit lebih terang */ border-top: none; }
+    
+    /* Sel Tabel */
+    .tabel-barang td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 12px 10px; vertical-align: middle; color: #334155; }
+    .tabel-barang td:first-child { border-left: 1px solid #e2e8f0; }
     
     .tabel-barang tr:nth-child(even) td { background-color: #f8fafc; }
-    .tabel-barang tr:hover td { background-color: #f0f9ff; }
+    .tabel-barang tr:hover td { background-color: #e0f2fe; color: #0f172a; }
     
     .text-center { text-align: center; }
-    .text-right { text-align: right; font-family: 'Courier New', monospace; font-weight: 600; }
+    .text-right { text-align: right; font-family: 'Courier New', monospace; font-weight: 700; color: #0284c7; }
 
-    #status-loading { text-align: center; padding: 40px 20px; font-weight: bold; color: #0284c7; font-size: 0.95rem; background: #fff; border-radius: 10px; margin-bottom: 15px; }
+    #status-loading { 
+      text-align: center; padding: 40px 20px; font-weight: 700; color: #0284c7; font-size: 1.1rem; 
+      background: #fff; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
+      border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    }
+    .spinner { border: 4px solid #e2e8f0; border-top: 4px solid #0284c7; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* RESPONSIVE LAYOUT KHUSUS HP */
+    /* RESPONSIVE KHUSUS HP (UI/UX FIX) */
     @media (max-width: 600px) {
-      .site-header { padding: 12px 10px; gap: 6px; }
-      .logo-box img { max-height: 42px; }
-      .header-title { padding: 0; }
-      .header-title h1 { font-size: 0.9rem; line-height: 1.2; margin-bottom: 2px; }
-      .header-title p { font-size: 0.7rem; line-height: 1.2; }
+      .site-header { padding: 10px 12px; gap: 8px; }
+      .logo-box img { max-height: 40px; }
+      
+      .menu-container { padding: 10px 15px; }
+      .hamburger-btn { padding: 8px 14px; font-size: 0.85rem; }
+      .ruangan-aktif-label { font-size: 0.95rem; }
+      
+      .dropdown-nav { grid-template-columns: repeat(2, 1fr); padding: 10px; gap: 8px; } 
 
-      .menu-container { flex-direction: row; }
-      .dropdown-nav { grid-template-columns: repeat(2, 1fr); } /* 2 kolom tombol di HP */
-
-      .toolbar-aksi { flex-direction: column; align-items: flex-start; padding: 12px 15px; gap: 12px; }
+      .toolbar-aksi { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
       .search-box { max-width: 100%; }
-      .toolbar-aksi h2 { font-size: 1rem; }
+      .toolbar-aksi h2 { font-size: 1.05rem; }
 
       .table-responsive { max-height: 60vh; }
+      .tabel-barang td { padding: 10px 6px; }
     }
   </style>
 </head>
@@ -163,7 +172,7 @@
 
   <header class="site-header">
     <div class="logo-box">
-      <img src="logo.png" alt="Logo Serang">
+      <img src="kotaserang.png" alt="Logo Serang">
     </div>
     <div class="header-title">
       <h1>KARTU INVENTARIS RUANGAN</h1>
@@ -181,15 +190,15 @@
       <button class="hamburger-btn" onclick="toggleMenu()">
         ☰ Pilih Ruangan
       </button>
-      <div class="ruangan-aktif-label" id="label-ruangan-atas">KASAT</div>
+      <div class="ruangan-aktif-label" id="label-ruangan-atas">KASAT</div> <!-- Default KASAT -->
 
       <!-- Dropdown Navigasi -->
       <div class="dropdown-nav" id="dropdown-menu">
-        <button class="btn-nav" onclick="gantiRuangan('KASAT', this)">KASAT</button>
+        <button class="btn-nav active" onclick="gantiRuangan('KASAT', this)">KASAT</button> <!-- Default KASAT -->
         <button class="btn-nav" onclick="gantiRuangan('SEKRETARIS', this)">SEKRETARIS</button>
         <button class="btn-nav" onclick="gantiRuangan('UMPEG', this)">UMPEG</button>
         <button class="btn-nav" onclick="gantiRuangan('KEUANGAN', this)">KEUANGAN</button>
-        <button class="btn-nav active" onclick="gantiRuangan('GUDANG', this)">GUDANG</button>
+        <button class="btn-nav" onclick="gantiRuangan('GUDANG', this)">GUDANG</button>
         <button class="btn-nav" onclick="gantiRuangan('TRANTIBUM', this)">TRANTIBUM</button>
         <button class="btn-nav" onclick="gantiRuangan('PEP', this)">PEP</button>
         <button class="btn-nav" onclick="gantiRuangan('LINMAS', this)">LINMAS</button>
@@ -203,30 +212,33 @@
 
     <!-- PENCARIAN & JUDUL TABEL -->
     <div class="toolbar-aksi">
-      <h2 id="judul-ruangan">📍 KASAT</h2>
+      <h2 id="judul-ruangan">📍 KASAT</h2> <!-- Default KASAT -->
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="inputPencarian" placeholder="Cari Barang, Merek, atau Kode..." onkeyup="cariDataBarang()">
       </div>
     </div>
 
-    <div id="status-loading">⏳ Menarik Data dari Database...</div>
+    <div id="status-loading">
+      <div class="spinner"></div>
+      <span id="loading-text">Menarik Data dari Database...</span>
+    </div>
 
     <div class="table-responsive">
       <table class="tabel-barang" id="tabel-utama" style="display: none;">
         <thead>
           <tr>
-            <th rowspan="2" width="3%">No.</th>
-            <th rowspan="2" width="18%">Jenis Barang/ Nama Barang</th>
-            <th rowspan="2" width="12%">Merek/ Model</th>
-            <th rowspan="2" width="8%">No. Seri Pabrik</th>
+            <th rowspan="2" width="4%">No.</th>
+            <th rowspan="2" width="20%">Jenis Barang / Nama Barang</th>
+            <th rowspan="2" width="10%">Merek / Model</th>
+            <th rowspan="2" width="10%">No. Seri Pabrik</th>
             <th rowspan="2" width="6%">Ukuran</th>
             <th rowspan="2" width="6%">Bahan</th>
-            <th rowspan="2" width="5%">Tahun Pembuatan/<br>Pembelian</th>
+            <th rowspan="2" width="6%">Tahun Pembuatan/<br>Pembelian</th>
             <th rowspan="2" width="10%">No. Kode Barang</th>
             <th rowspan="2" width="9%">Harga Beli/<br>Perolehan</th>
             <th colspan="3">Keadaan Barang</th>
-            <th rowspan="2" width="10%">Keterangan</th>
+            <th rowspan="2" width="9%">Keterangan</th>
           </tr>
           <tr>
             <th width="4%">Baik<br>(B)</th>
@@ -244,12 +256,10 @@
     const SHEET_ID = '1A4xCPByCydWjU5E8FsckHyXrRy3UPZFjsGlx86NdVY4'; 
     let dataBarangAktif = []; 
 
-    // Fungsi Buka/Tutup Hamburger Menu
     function toggleMenu() {
       document.getElementById("dropdown-menu").classList.toggle("show");
     }
 
-    // Menutup menu jika user mengklik di luar area menu
     window.onclick = function(event) {
       if (!event.target.matches('.hamburger-btn')) {
         const dropdowns = document.getElementsByClassName("dropdown-nav");
@@ -271,7 +281,6 @@
       document.getElementById('judul-ruangan').innerText = `📍 ${namaTab}`;
       document.getElementById('inputPencarian').value = '';
       
-      // Tutup menu setelah memilih ruangan
       document.getElementById("dropdown-menu").classList.remove("show");
       
       tarikDataSheets(namaTab);
@@ -279,8 +288,8 @@
 
     function tarikDataSheets(namaTab) {
       document.getElementById('tabel-utama').style.display = 'none';
-      document.getElementById('status-loading').style.display = 'block';
-      document.getElementById('status-loading').innerHTML = `⏳ Mengambil data ruangan <strong>${namaTab}</strong>...`;
+      document.getElementById('status-loading').style.display = 'flex';
+      document.getElementById('loading-text').innerHTML = `Mengambil data ruangan <strong>${namaTab}</strong>...`;
       
       const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${namaTab}&tqx=out:json`;
 
@@ -330,12 +339,12 @@
       let htmlTabel = "";
 
       if (arrayData.length === 0) {
-        htmlTabel = `<tr><td colspan="13" class="text-center" style="padding:30px; font-size:0.95rem; color:#ef4444;">Barang tidak ditemukan.</td></tr>`;
+        htmlTabel = `<tr><td colspan="13" class="text-center" style="padding:40px; font-size:1rem; font-weight:bold; color:#ef4444;">❌ Data Barang Tidak Ditemukan.</td></tr>`;
       } else {
         arrayData.forEach(item => {
           htmlTabel += `
             <tr>
-              <td class="text-center">${item.no}</td>
+              <td class="text-center"><strong>${item.no}</strong></td>
               <td><strong>${item.nama}</strong></td>
               <td>${item.merek}</td>
               <td>${item.seri}</td>
@@ -344,9 +353,9 @@
               <td class="text-center">${item.tahun}</td>
               <td class="text-center">${item.kode}</td>
               <td class="text-right">${item.harga}</td>
-              <td class="text-center">${item.b}</td>
-              <td class="text-center">${item.kb}</td>
-              <td class="text-center">${item.rb}</td>
+              <td class="text-center"><strong>${item.b}</strong></td>
+              <td class="text-center"><strong>${item.kb}</strong></td>
+              <td class="text-center"><strong>${item.rb}</strong></td>
               <td>${item.ket}</td>
             </tr>
           `;
@@ -367,8 +376,9 @@
       renderTabelHTML(hasilPencarian);
     }
 
+    // Default memuat KASAT pertama kali
     window.onload = function() {
-      tarikDataSheets('GUDANG');
+      tarikDataSheets('KASAT'); 
     };
   </script>
 </body>
