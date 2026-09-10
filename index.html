@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>KIR- Satpol PP Kota Serang</title>
+  <title>KIR - Satpol PP Kota Serang</title>
   
   <style>
     /* RESET & BASE STYLES */
@@ -28,27 +28,28 @@
       gap: 12px;
     }
     .logo-box { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .logo-box img { max-height: 55px; width: auto; object-fit: contain; }
+    /* Batasi lebar logo agar tidak memakan tempat teks */
+    .logo-box img { max-height: 55px; max-width: 60px; object-fit: contain; }
     
     .header-title { text-align: center; flex: 1; padding: 0; min-width: 0; }
-    .header-title h1 { font-size: clamp(1.05rem, 3vw, 1.3rem); font-weight: 900; color: #0f172a; margin-bottom: 4px; line-height: 1.2; letter-spacing: -0.5px; }
-    .header-title p { font-size: clamp(0.75rem, 2vw, 0.9rem); color: #475569; font-weight: 700; line-height: 1.3; }
+    .header-title h1 { font-size: 1.25rem; font-weight: 900; color: #0f172a; margin-bottom: 4px; line-height: 1.2; letter-spacing: -0.2px; }
+    .header-title p { font-size: 0.85rem; color: #475569; font-weight: 700; line-height: 1.3; }
 
     /* KONTROL UTAMA */
     .kontrol-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    /* HAMBURGER MENU STYLES (Diperbaiki) */
+    /* HAMBURGER MENU STYLES */
     .menu-container {
       position: relative;
       margin-bottom: 15px;
       display: flex;
-      justify-content: flex-start; /* Posisi tombol di kiri pada Desktop */
+      justify-content: flex-start; 
     }
 
     .hamburger-btn {
       background: #0284c7; color: white; border: none; padding: 10px 20px;
       border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; gap: 8px; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;
       box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
     }
     .hamburger-btn:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); }
@@ -137,19 +138,27 @@
     .spinner { border: 4px solid #e2e8f0; border-top: 4px solid #0284c7; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* RESPONSIVE KHUSUS HP (UI/UX FIX) */
+    /* =========================================
+       RESPONSIVE KHUSUS HP (PENYESUAIAN HEADER TUNTAS)
+       ========================================= */
     @media (max-width: 600px) {
-      .site-header { padding: 10px 12px; gap: 8px; }
-      .logo-box img { max-height: 40px; }
+      .site-header { padding: 12px 8px; gap: 6px; }
       
-      /* Tombol Hamburger di HP dibuat lebar 100% agar nyaman dipencet */
-      .hamburger-btn { width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
+      /* Mengecilkan logo secara proporsional agar teks leluasa di tengah */
+      .logo-box img { max-height: 38px; max-width: 45px; }
+      
+      /* Merapikan ukuran huruf dan jarak antar baris */
+      .header-title h1 { font-size: 0.85rem; line-height: 1.2; margin-bottom: 2px; letter-spacing: 0; }
+      .header-title p { font-size: 0.65rem; line-height: 1.2; }
+      
+      /* Tombol Hamburger penuh 100% */
+      .hamburger-btn { width: 100%; padding: 12px; font-size: 0.95rem; }
       
       .dropdown-nav { grid-template-columns: repeat(2, 1fr); padding: 10px; gap: 8px; } 
 
       .toolbar-aksi { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
       .search-box { max-width: 100%; }
-      .toolbar-aksi h2 { font-size: 1.1rem; justify-content: center; }
+      .toolbar-aksi h2 { font-size: 1.1rem; justify-content: center; text-align: center; }
 
       .table-responsive { max-height: 60vh; }
       .tabel-barang td { padding: 10px 6px; }
@@ -173,10 +182,10 @@
 
   <div class="kontrol-container">
     
-    <!-- HAMBURGER MENU AREA (Dibersihkan dari Label Ganda) -->
+    <!-- HAMBURGER MENU AREA -->
     <div class="menu-container">
       <button class="hamburger-btn" onclick="toggleMenu()">
-        ☰ Pilih Daftar Ruangan
+        ☰ Pilih Ruangan
       </button>
 
       <!-- Dropdown Navigasi -->
@@ -197,7 +206,7 @@
       </div>
     </div>
 
-    <!-- PENCARIAN & JUDUL RUANGAN (Fokus 1 Judul Saja) -->
+    <!-- PENCARIAN & JUDUL RUANGAN -->
     <div class="toolbar-aksi">
       <h2 id="judul-ruangan">📍 RUANGAN KASAT</h2>
       <div class="search-box">
@@ -265,7 +274,6 @@
       tombolSemua.forEach(btn => btn.classList.remove('active'));
       elemenTombol.classList.add('active');
       
-      // Update Judul Tunggal di atas Tabel
       document.getElementById('judul-ruangan').innerText = `📍 RUANGAN ${namaTab}`;
       document.getElementById('inputPencarian').value = '';
       
