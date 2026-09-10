@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>KIR Dinamis SI-ASEP - Satpol PP Kota Serang</title>
+  <title>KIR- Satpol PP Kota Serang</title>
   
   <style>
     /* RESET & BASE STYLES */
@@ -37,30 +37,22 @@
     /* KONTROL UTAMA */
     .kontrol-container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
     
-    /* HAMBURGER MENU STYLES */
+    /* HAMBURGER MENU STYLES (Diperbaiki) */
     .menu-container {
       position: relative;
       margin-bottom: 15px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      padding: 12px 18px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      border: 1px solid #e2e8f0;
+      justify-content: flex-start; /* Posisi tombol di kiri pada Desktop */
     }
 
     .hamburger-btn {
-      background: #0284c7; color: white; border: none; padding: 10px 16px;
+      background: #0284c7; color: white; border: none; padding: 10px 20px;
       border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; gap: 8px; transition: all 0.3s;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
     }
-    .hamburger-btn:hover { background: #0369a1; transform: translateY(-1px); }
+    .hamburger-btn:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); }
     .hamburger-btn:active { transform: translateY(0); }
-    
-    .ruangan-aktif-label { font-weight: 800; color: #0f172a; font-size: 1.05rem; letter-spacing: 0.5px; }
 
     /* MENU DROPDOWN DENGAN ANIMASI */
     .dropdown-nav {
@@ -73,7 +65,7 @@
       left: 0;
       width: 100%;
       background: #ffffff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       border-radius: 12px;
       border: 1px solid #e2e8f0;
       z-index: 999;
@@ -92,13 +84,13 @@
     .btn-nav:hover { background: #f1f5f9; border-color: #94a3b8; color: #0f172a; }
     .btn-nav.active { background: #0284c7; color: white; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); }
 
-    /* TOOLBAR PENCARIAN */
+    /* TOOLBAR PENCARIAN & JUDUL RUANGAN */
     .toolbar-aksi {
       display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
       background: #fff; padding: 15px 20px; border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom: 20px; gap: 15px;
     }
-    .toolbar-aksi h2 { font-size: 1.15rem; color: #0f172a; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0; }
+    .toolbar-aksi h2 { font-size: 1.15rem; color: #0f172a; font-weight: 900; display: flex; align-items: center; gap: 8px; margin: 0; text-transform: uppercase; }
     
     .search-box { position: relative; display: flex; align-items: center; width: 100%; max-width: 350px; }
     .search-box input {
@@ -119,18 +111,15 @@
     
     .tabel-barang { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; font-size: 11.5px; }
     
-    /* Header Tabel Gelap Premium */
     .tabel-barang thead { position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
     .tabel-barang th { 
-      background-color: #0f172a; /* Warna Navy Gelap */
-      color: #f8fafc; /* Teks Putih */
+      background-color: #0f172a; color: #f8fafc; 
       font-weight: 700; text-align: center; border-bottom: 1px solid #1e293b; border-right: 1px solid #1e293b; 
       padding: 12px 8px; letter-spacing: 0.3px; text-transform: uppercase; font-size: 10.5px;
     }
     .tabel-barang th:first-child { border-left: 1px solid #1e293b; }
-    .tabel-barang thead tr:nth-child(2) th { background-color: #1e293b; /* Baris kedua sedikit lebih terang */ border-top: none; }
+    .tabel-barang thead tr:nth-child(2) th { background-color: #1e293b; border-top: none; }
     
-    /* Sel Tabel */
     .tabel-barang td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 12px 10px; vertical-align: middle; color: #334155; }
     .tabel-barang td:first-child { border-left: 1px solid #e2e8f0; }
     
@@ -153,15 +142,14 @@
       .site-header { padding: 10px 12px; gap: 8px; }
       .logo-box img { max-height: 40px; }
       
-      .menu-container { padding: 10px 15px; }
-      .hamburger-btn { padding: 8px 14px; font-size: 0.85rem; }
-      .ruangan-aktif-label { font-size: 0.95rem; }
+      /* Tombol Hamburger di HP dibuat lebar 100% agar nyaman dipencet */
+      .hamburger-btn { width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
       
       .dropdown-nav { grid-template-columns: repeat(2, 1fr); padding: 10px; gap: 8px; } 
 
       .toolbar-aksi { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
       .search-box { max-width: 100%; }
-      .toolbar-aksi h2 { font-size: 1.05rem; }
+      .toolbar-aksi h2 { font-size: 1.1rem; justify-content: center; }
 
       .table-responsive { max-height: 60vh; }
       .tabel-barang td { padding: 10px 6px; }
@@ -172,7 +160,7 @@
 
   <header class="site-header">
     <div class="logo-box">
-      <img src="kotaserang.png" alt="Logo Serang">
+      <img src="logo.png" alt="Logo Serang">
     </div>
     <div class="header-title">
       <h1>KARTU INVENTARIS RUANGAN</h1>
@@ -185,16 +173,15 @@
 
   <div class="kontrol-container">
     
-    <!-- HAMBURGER MENU AREA -->
+    <!-- HAMBURGER MENU AREA (Dibersihkan dari Label Ganda) -->
     <div class="menu-container">
       <button class="hamburger-btn" onclick="toggleMenu()">
-        ☰ Pilih Ruangan
+        ☰ Pilih Daftar Ruangan
       </button>
-      <div class="ruangan-aktif-label" id="label-ruangan-atas">KASAT</div> <!-- Default KASAT -->
 
       <!-- Dropdown Navigasi -->
       <div class="dropdown-nav" id="dropdown-menu">
-        <button class="btn-nav active" onclick="gantiRuangan('KASAT', this)">KASAT</button> <!-- Default KASAT -->
+        <button class="btn-nav active" onclick="gantiRuangan('KASAT', this)">KASAT</button>
         <button class="btn-nav" onclick="gantiRuangan('SEKRETARIS', this)">SEKRETARIS</button>
         <button class="btn-nav" onclick="gantiRuangan('UMPEG', this)">UMPEG</button>
         <button class="btn-nav" onclick="gantiRuangan('KEUANGAN', this)">KEUANGAN</button>
@@ -210,9 +197,9 @@
       </div>
     </div>
 
-    <!-- PENCARIAN & JUDUL TABEL -->
+    <!-- PENCARIAN & JUDUL RUANGAN (Fokus 1 Judul Saja) -->
     <div class="toolbar-aksi">
-      <h2 id="judul-ruangan">📍 KASAT</h2> <!-- Default KASAT -->
+      <h2 id="judul-ruangan">📍 RUANGAN KASAT</h2>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="inputPencarian" placeholder="Cari Barang, Merek, atau Kode..." onkeyup="cariDataBarang()">
@@ -260,6 +247,7 @@
       document.getElementById("dropdown-menu").classList.toggle("show");
     }
 
+    // Menutup menu jika klik di luar area
     window.onclick = function(event) {
       if (!event.target.matches('.hamburger-btn')) {
         const dropdowns = document.getElementsByClassName("dropdown-nav");
@@ -277,12 +265,11 @@
       tombolSemua.forEach(btn => btn.classList.remove('active'));
       elemenTombol.classList.add('active');
       
-      document.getElementById('label-ruangan-atas').innerText = namaTab;
-      document.getElementById('judul-ruangan').innerText = `📍 ${namaTab}`;
+      // Update Judul Tunggal di atas Tabel
+      document.getElementById('judul-ruangan').innerText = `📍 RUANGAN ${namaTab}`;
       document.getElementById('inputPencarian').value = '';
       
       document.getElementById("dropdown-menu").classList.remove("show");
-      
       tarikDataSheets(namaTab);
     }
 
@@ -376,7 +363,7 @@
       renderTabelHTML(hasilPencarian);
     }
 
-    // Default memuat KASAT pertama kali
+    // Default memuat KASAT
     window.onload = function() {
       tarikDataSheets('KASAT'); 
     };
