@@ -28,7 +28,6 @@
       gap: 12px;
     }
     .logo-box { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    /* Batasi lebar logo agar tidak memakan tempat teks */
     .logo-box img { max-height: 55px; max-width: 60px; object-fit: contain; }
     
     .header-title { text-align: center; flex: 1; padding: 0; min-width: 0; }
@@ -46,13 +45,27 @@
       justify-content: flex-start; 
     }
 
+    /* ANIMASI NYALA REDUP */
+    @keyframes nyalaRedup {
+      0% { box-shadow: 0 0 5px rgba(2, 132, 199, 0.4); background-color: #0284c7; }
+      50% { box-shadow: 0 0 20px rgba(2, 132, 199, 0.85); background-color: #0369a1; }
+      100% { box-shadow: 0 0 5px rgba(2, 132, 199, 0.4); background-color: #0284c7; }
+    }
+
     .hamburger-btn {
-      background: #0284c7; color: white; border: none; padding: 10px 20px;
+      color: white; border: none; padding: 10px 20px;
       border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;
-      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+      animation: nyalaRedup 2.5s infinite; /* Memanggil efek nyala redup */
     }
-    .hamburger-btn:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); }
+    
+    /* Menghentikan efek nyala redup saat tombol disentuh/diklik */
+    .hamburger-btn:hover { 
+      transform: translateY(-2px); 
+      animation: none; 
+      background: #0369a1; 
+      box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3); 
+    }
     .hamburger-btn:active { transform: translateY(0); }
 
     /* MENU DROPDOWN DENGAN ANIMASI */
@@ -138,28 +151,17 @@
     .spinner { border: 4px solid #e2e8f0; border-top: 4px solid #0284c7; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* =========================================
-       RESPONSIVE KHUSUS HP (PENYESUAIAN HEADER TUNTAS)
-       ========================================= */
+    /* RESPONSIVE KHUSUS HP (PENYESUAIAN HEADER TUNTAS) */
     @media (max-width: 600px) {
       .site-header { padding: 12px 8px; gap: 6px; }
-      
-      /* Mengecilkan logo secara proporsional agar teks leluasa di tengah */
       .logo-box img { max-height: 38px; max-width: 45px; }
-      
-      /* Merapikan ukuran huruf dan jarak antar baris */
       .header-title h1 { font-size: 0.85rem; line-height: 1.2; margin-bottom: 2px; letter-spacing: 0; }
       .header-title p { font-size: 0.65rem; line-height: 1.2; }
-      
-      /* Tombol Hamburger penuh 100% */
       .hamburger-btn { width: 100%; padding: 12px; font-size: 0.95rem; }
-      
       .dropdown-nav { grid-template-columns: repeat(2, 1fr); padding: 10px; gap: 8px; } 
-
       .toolbar-aksi { flex-direction: column; align-items: stretch; padding: 15px; gap: 12px; }
       .search-box { max-width: 100%; }
       .toolbar-aksi h2 { font-size: 1.1rem; justify-content: center; text-align: center; }
-
       .table-responsive { max-height: 60vh; }
       .tabel-barang td { padding: 10px 6px; }
     }
