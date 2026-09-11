@@ -93,14 +93,6 @@
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
     .history-item:hover { background-color: var(--primary-soft); border-color: #bae6fd; }
     .app-footer { text-align: center; padding: 16px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
-
-    /* KHUSUS AREA CETAK STIKER */
-    #printArea { display: none; }
-    @media print {
-        body > *:not(#printArea) { display: none !important; }
-        #printArea { display: block !important; width: 100%; background: #fff; padding: 0; }
-        @page { margin: 10px; }
-    }
   </style>
 </head>
 <body>
@@ -244,6 +236,7 @@
     </section>
   </main>
 
+  <!-- MODAL PIN ADMIN -->
   <div id="modalPin" class="modal" role="dialog" aria-modal="true">
     <div class="modal-box" style="text-align: center;">
       <div style="width: 48px; height: 48px; background: var(--primary-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 20px;"><i class="fa-solid fa-lock"></i></div>
@@ -257,6 +250,7 @@
     </div>
   </div>
 
+  <!-- MODAL HAPUS SEMUA DATA -->
   <div id="modalHapusSemua" class="modal" role="dialog" aria-modal="true">
     <div class="modal-box" style="text-align: center;">
       <div style="width: 52px; height: 52px; background: var(--danger-soft); color: var(--danger-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -270,6 +264,7 @@
     </div>
   </div>
 
+  <!-- MODAL CETAK STIKER -->
   <div id="modalCetakStikerMassal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px;">
@@ -287,18 +282,23 @@
     </div>
   </div>
 
+  <!-- MODAL CETAK EXCEL -->
   <div id="modalCetakLaporan" class="modal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--text); font-size: 15px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-excel" style="color: #22c55e;"></i> Ekspor Data</h3>
         <button type="button" onclick="closeModalCetakLaporan()" style="background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">&times;</button>
       </div>
-      <div style="margin-bottom: 18px;">
+      <div style="margin-bottom: 12px;">
         <label for="selectJenisDokumen" style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Pilih Sumber Data:</label>
-        <select id="selectJenisDokumen" class="form-control">
+        <select id="selectJenisDokumen" class="form-control" onchange="document.getElementById('divFilterRuangan').style.display = (this.value === 'KIR_EXCEL') ? 'block' : 'none';">
           <option value="ALL_EXCEL">📊 Data Master (Global)</option>
           <option value="KIR_EXCEL">🚪 Data Ruangan (KIR)</option>
         </select>
+      </div>
+      <div id="divFilterRuangan" style="margin-bottom: 18px; display: none;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Filter Ruangan (Opsional):</label>
+        <input type="text" id="inputFilterRuangan" class="form-control" placeholder="Ketik nama ruangan... (Kosongi untuk tarik semua KIR)">
       </div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button type="button" onclick="closeModalCetakLaporan()" class="btn btn-dark" style="padding: 10px 14px; font-size: 12px; flex: 1;">Batal</button>
@@ -307,16 +307,14 @@
     </div>
   </div>
 
-  <div id="printArea"></div>
-
   <footer class="app-footer">
     <p><strong>SI-ACEP</strong> &copy; Satpol PP Kota Serang</p>
   </footer>
 
   <script>
-    // MAS ACEP: PASTIKAN IP LAPTOP ANDA BENAR DI SINI!
+    // MAS ACEP: UBAH IP SESUAI LAPTOP ANDA DI SINI
     const CONFIG = {
-      API_URL: "http://10.63.153.103//siacep/cek_aset.php", 
+      API_URL: "http://10.63.153.103/siacep/cek_aset.php", 
       SESSION_TIMEOUT_MS: 15 * 60 * 1000
     };
 
@@ -725,14 +723,15 @@
       }).catch(err => { btn.innerHTML = `Konfirmasi Hapus`; btn.disabled = false; alert("Gangguan koneksi pada tahap reset data."); });
     };
 
-    // ==========================================
-    // LOGIKA CETAK EXCEL KLIEN HTML (ANTI BLOKIR)
-    // ==========================================
+    // =========================================================
+    // EXCEL: HEADER BARU & FILTER RUANGAN KIR (ANTI TARIK SEMUA)
+    // =========================================================
     window.openModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "flex"; };
     window.closeModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "none"; };
     
     window.eksekusiCetakLaporan = function () {
         const val = document.getElementById("selectJenisDokumen").value;
+        const filterRuangan = document.getElementById("inputFilterRuangan") ? document.getElementById("inputFilterRuangan").value.trim().toLowerCase() : "";
         const type = (val === "ALL_EXCEL") ? "master" : "kir";
         const btn = document.getElementById("btnEksporUnduh");
         const oriText = btn.innerHTML;
@@ -748,18 +747,58 @@
             window.closeModalCetakLaporan();
 
             if(resData.result === 'success') {
-                let htmlTable = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>`;
-                if (type === 'kir') {
-                    htmlTable += `<h2>KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
-                    htmlTable += `<table border="1"><tr style="background:#e2e8f0;"><th>No</th><th>Ruangan</th><th>Kode Barang</th><th>Nomor Register</th><th>Nama Barang</th><th>Merk / Type</th><th>Ukuran / CC</th><th>Bahan</th><th>Tahun Perolehan</th><th>Kondisi (B/KB/RB)</th><th>Status Inventarisasi</th></tr>`;
-                } else {
-                    htmlTable += `<h2>DATA MASTER INVENTARIS (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
-                    htmlTable += `<table border="1"><tr style="background:#bae6fd;"><th>No</th><th>Kode Barang</th><th>Nomor Register</th><th>Nama Barang</th><th>Merk / Type</th><th>Ukuran / CC</th><th>Bahan</th><th>Tahun Perolehan</th><th>Kondisi</th><th>Lokasi Ruangan</th><th>Status Pengecekan</th></tr>`;
+                let filteredData = resData.data;
+
+                // LOGIKA FILTER: Jika cetak KIR dan mengisi kolom filter, data diayak dulu.
+                if (type === 'kir' && filterRuangan !== "") {
+                    filteredData = filteredData.filter(r => r.ruangan && r.ruangan.toLowerCase().includes(filterRuangan));
                 }
 
-                resData.data.forEach((r, i) => {
+                if(filteredData.length === 0) {
+                    return alert("Tidak ada data aset ditemukan untuk kriteria ruangan tersebut.");
+                }
+
+                let htmlTable = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>`;
+                
+                if (type === 'kir') {
+                    htmlTable += `<h2>KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
+                    if (filterRuangan !== "") htmlTable += `<h3>RUANGAN: ${filterRuangan.toUpperCase()}</h3>`;
+                    
+                    htmlTable += `<table border="1"><tr style="background:#e2e8f0;">
+                        <th>No</th>
+                        <th>Nama Barang</th>
+                        <th>Merk/Type</th>
+                        <th>Reg</th>
+                        <th>Kode Barang</th>
+                        <th>Ukuran/CC</th>
+                        <th>Bahan</th>
+                        <th>Tahun Perolehan</th>
+                        <th>Kondisi</th>
+                        <th>Keterangan</th>
+                        <th>Ruangan</th>
+                        <th>Waktu inventarisasi</th>
+                    </tr>`;
+                } else {
+                    htmlTable += `<h2>DATA MASTER INVENTARIS (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
+                    htmlTable += `<table border="1"><tr style="background:#bae6fd;"><th>No</th><th>Kode Barang</th><th>Nomor Register</th><th>Nama Barang</th><th>Merk / Type</th><th>Ukuran / CC</th><th>Bahan</th><th>Tahun Perolehan</th><th>Kondisi Asal</th><th>Lokasi Ruangan</th><th>Status Pengecekan</th></tr>`;
+                }
+
+                filteredData.forEach((r, i) => {
                     if (type === 'kir') {
-                        htmlTable += `<tr><td>${i+1}</td><td>${r.ruangan}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td><td>${r.reg}</td><td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.ukuran_cc}</td><td>${r.bahan}</td><td>${r.tahun_perolehan}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.status_inventarisasi}</td></tr>`;
+                        htmlTable += `<tr>
+                            <td>${i+1}</td>
+                            <td>${r.nama_barang}</td>
+                            <td>${r.merk_type}</td>
+                            <td>${r.reg}</td>
+                            <td style='mso-number-format:"\\@";'>${r.kode_barang}</td>
+                            <td>${r.ukuran_cc}</td>
+                            <td>${r.bahan}</td>
+                            <td>${r.tahun_perolehan}</td>
+                            <td></td> <!-- KONDISI DIKOSONGKAN SESUAI PERMINTAAN -->
+                            <td></td> <!-- KETERANGAN DIKOSONGKAN SESUAI PERMINTAAN -->
+                            <td>${r.ruangan}</td>
+                            <td>${r.status_inventarisasi}</td>
+                        </tr>`;
                     } else {
                         htmlTable += `<tr><td>${i+1}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td><td>${r.reg}</td><td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.ukuran_cc}</td><td>${r.bahan}</td><td>${r.tahun_perolehan}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.ruangan}</td><td>${r.status_inventarisasi}</td></tr>`;
                     }
@@ -777,9 +816,9 @@
         .catch(err => { btn.innerHTML = oriText; btn.disabled = false; alert("Gangguan saat menarik data Excel."); });
     };
 
-    // ==========================================
-    // LOGIKA CETAK STIKER KLIEN HTML (ANTI BLOKIR)
-    // ==========================================
+    // =========================================================
+    // CETAK STIKER: MEMBUKA TAB BARU (TIDAK OTOMATIS NGE-PRINT)
+    // =========================================================
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
@@ -787,23 +826,29 @@
         let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
 
-        const printArea = document.getElementById("printArea");
-        let stikerHTML = `<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;">`;
+        let stikerHTML = `<!DOCTYPE html><html><head><title>Cetak Label QR</title></head><body style="font-family: Arial, sans-serif; padding: 20px;">
+        <div style="margin-bottom: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">🖨️ Cetak Sekarang</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; width: 100%;">`;
 
         arrayKode.forEach(kd => {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
             stikerHTML += `
             <div style="background: white; border: 2px solid #000; width: 170px; text-align: center; padding: 10px; border-radius: 8px; box-sizing: border-box; break-inside: avoid; margin-bottom: 15px; color: #000;">
-                <div style="font-size: 11px; font-weight: 900; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; font-family: Arial, sans-serif; line-height: 1.2;">SI-ACEP<br>SATPOL PP</div>
+                <div style="font-size: 11px; font-weight: 900; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; line-height: 1.2;">SI-ACEP<br>SATPOL PP</div>
                 <img src="${qrUrl}" style="width:110px; height:110px; margin: 0 auto; display: block;">
                 <div style="font-size: 11px; font-family: monospace; font-weight: bold; margin-top: 6px;">${kd}</div>
             </div>`;
         });
 
-        stikerHTML += `</div>`;
-        printArea.innerHTML = stikerHTML;
+        stikerHTML += `</div>
+        <style>@media print { button { display: none; } body { padding: 0 !important; margin: 0; } }</style>
+        </body></html>`;
         
-        setTimeout(() => { window.print(); }, 1000);
+        let printWin = window.open('', '_blank');
+        printWin.document.write(stikerHTML);
+        printWin.document.close();
     };
 
     window.eksekusiCetakStikerMassalModal = function () { 
