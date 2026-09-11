@@ -323,7 +323,7 @@
 
   <script>
     const CONFIG = {
-      API_URL: "http://10.63.153.103/siacep/cek_aset.php",
+      API_URL: "http://10.63.153.103/siacep/cek_aset.php", // GANTI DENGAN ALAMAT IP LAPTOP ANDA!
       SESSION_TIMEOUT_MS: 15 * 60 * 1000
     };
 
@@ -793,9 +793,15 @@
         else { alert("Kesalahan: " + data.message); }
       }).catch(err => alert("Terjadi kesalahan transmisi data."));
     };
-    function cetakKIR() { window.open(`${CONFIG.API_URL}?action=export_kir_excel`, "_blank"); }
-    function cetakHasilInventaris() { window.open(`${CONFIG.API_URL}?action=export_hasil_excel`, "_blank"); }
-    window.cetakStikerMassal = function (listKode) { let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []); if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset."); window.open(`${CONFIG.API_URL}?action=cetak_stiker_massal&kodes=${encodeURIComponent(arrayKode.join(","))}`, "_blank"); };
+    
+    function cetakKIR() { window.location.href = `${CONFIG.API_URL}?action=export_kir_excel`; }
+    function cetakHasilInventaris() { window.location.href = `${CONFIG.API_URL}?action=export_hasil_excel`; }
+    window.cetakStikerMassal = function (listKode) { 
+        let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []); 
+        if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset."); 
+        window.location.href = `${CONFIG.API_URL}?action=cetak_stiker_massal&kodes=${encodeURIComponent(arrayKode.join(","))}`; 
+    };
+
     window.openModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "flex"; };
     window.closeModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "none"; };
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
