@@ -627,8 +627,7 @@
       .then(res => res.json()).then(data => { 
         if (data.result === "need_confirmation") {
           window.showToast("⚠️ Ditolak: Bukan Aset Ruangan Ini!");
-          alert("DITOLAK!\nBukan Aset Ruangan Ini.");
-          siapkanHalamanScanner();
+          document.getElementById("modalBarangNyasar").style.display = "flex";
           return; 
         }
         memoryCache.delete(kodeBersih); window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, data.result === "success"); 
@@ -925,7 +924,7 @@
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
-    // PEMBUATAN STIKER: DESAIN SESUAI SCREENSHOT
+    // PEMBUATAN STIKER: KODE BARANG SATU BARIS (NO WRAP)
     window.cetakStikerMassal = async function (listKode) {
         let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
@@ -973,11 +972,23 @@
             .stiker-qr-wrapper { border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center;}
             .stiker-qr { width: 65px; height: 65px; flex-shrink: 0; }
             
-            .stiker-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; }
+            .stiker-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-width: 0; }
             .detail-group { display: flex; flex-direction: column; line-height: 1.2;}
             .detail-label { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 1px;}
-            .detail-value { font-size: 11px; font-weight: 800; color: #0f172a; }
-            .value-kode { border: 1px dashed #94a3b8; padding: 3px 4px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11px; font-weight: 900; background: #f8fafc;}
+            .detail-value { font-size: 11px; font-weight: 800; color: #0f172a; word-break: break-word; }
+            
+            /* KODE BARANG DIPAKSA 1 BARIS & UKURAN DIPERKECIL */
+            .value-kode { 
+                border: 1px dashed #94a3b8; 
+                padding: 3px 4px; 
+                border-radius: 4px; 
+                font-family: 'Courier New', monospace; 
+                font-size: 7.5px; 
+                font-weight: 900; 
+                background: #f8fafc; 
+                white-space: nowrap; 
+                overflow: hidden; 
+            }
             
             .stiker-footer { border-top: 1px solid #cbd5e1; padding-top: 6px; font-size: 8px; font-weight: 800; text-align: center; color: #0f172a; }
 
