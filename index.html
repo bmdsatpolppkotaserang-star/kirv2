@@ -289,16 +289,12 @@
         <h3 style="margin: 0; color: var(--text); font-size: 15px; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-excel" style="color: #22c55e;"></i> Ekspor Data</h3>
         <button type="button" onclick="closeModalCetakLaporan()" style="background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">&times;</button>
       </div>
-      <div style="margin-bottom: 12px;">
-        <label for="selectJenisDokumen" style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Pilih Sumber Data:</label>
-        <select id="selectJenisDokumen" class="form-control" onchange="document.getElementById('divFilterRuangan').style.display = (this.value === 'KIR_EXCEL') ? 'block' : 'none';">
-          <option value="ALL_EXCEL">📊 Data Master (Global)</option>
-          <option value="KIR_EXCEL">🚪 Data Ruangan (KIR)</option>
+      <div style="margin-bottom: 18px;">
+        <label for="selectJenisDokumen" style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Pilih Laporan yang Sudah Dicatat:</label>
+        <select id="selectJenisDokumen" class="form-control">
+          <option value="ALL_EXCEL">📊 Excel Hasil Inventarisasi (Global)</option>
+          <option value="KIR_EXCEL">🚪 Excel Hasil KIR (Ruangan)</option>
         </select>
-      </div>
-      <div id="divFilterRuangan" style="margin-bottom: 18px; display: none;">
-        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Filter Ruangan (Opsional):</label>
-        <input type="text" id="inputFilterRuangan" class="form-control" placeholder="Ketik nama ruangan... (Kosongi untuk tarik semua KIR)">
       </div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button type="button" onclick="closeModalCetakLaporan()" class="btn btn-dark" style="padding: 10px 14px; font-size: 12px; flex: 1;">Batal</button>
@@ -723,15 +719,11 @@
       }).catch(err => { btn.innerHTML = `Konfirmasi Hapus`; btn.disabled = false; alert("Gangguan koneksi pada tahap reset data."); });
     };
 
-    // =========================================================
-    // EXCEL: HEADER BARU & FILTER RUANGAN KIR (ANTI TARIK SEMUA)
-    // =========================================================
     window.openModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "flex"; };
     window.closeModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "none"; };
     
     window.eksekusiCetakLaporan = function () {
         const val = document.getElementById("selectJenisDokumen").value;
-        const filterRuangan = document.getElementById("inputFilterRuangan") ? document.getElementById("inputFilterRuangan").value.trim().toLowerCase() : "";
         const type = (val === "ALL_EXCEL") ? "master" : "kir";
         const btn = document.getElementById("btnEksporUnduh");
         const oriText = btn.innerHTML;
@@ -747,22 +739,17 @@
             window.closeModalCetakLaporan();
 
             if(resData.result === 'success') {
-                let filteredData = resData.data;
-
-                // LOGIKA FILTER: Jika cetak KIR dan mengisi kolom filter, data diayak dulu.
-                if (type === 'kir' && filterRuangan !== "") {
-                    filteredData = filteredData.filter(r => r.ruangan && r.ruangan.toLowerCase().includes(filterRuangan));
-                }
+                // FILTER INTI: HANYA AMBIL DATA YANG SUDAH ADA STATUS INVENTARISASINYA
+                let filteredData = resData.data.filter(r => r.status_inventarisasi && r.status_inventarisasi.trim() !== "");
 
                 if(filteredData.length === 0) {
-                    return alert("Tidak ada data aset ditemukan untuk kriteria ruangan tersebut.");
+                    return alert("Belum ada data aset yang Anda catat/scan. Silakan lakukan inventarisasi terlebih dahulu.");
                 }
 
                 let htmlTable = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>`;
                 
                 if (type === 'kir') {
-                    htmlTable += `<h2>KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
-                    if (filterRuangan !== "") htmlTable += `<h3>RUANGAN: ${filterRuangan.toUpperCase()}</h3>`;
+                    htmlTable += `<h2>DATA HASIL KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
                     
                     htmlTable += `<table border="1"><tr style="background:#e2e8f0;">
                         <th>No</th>
@@ -779,8 +766,20 @@
                         <th>Waktu inventarisasi</th>
                     </tr>`;
                 } else {
-                    htmlTable += `<h2>DATA MASTER INVENTARIS (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
-                    htmlTable += `<table border="1"><tr style="background:#bae6fd;"><th>No</th><th>Kode Barang</th><th>Nomor Register</th><th>Nama Barang</th><th>Merk / Type</th><th>Ukuran / CC</th><th>Bahan</th><th>Tahun Perolehan</th><th>Kondisi Asal</th><th>Lokasi Ruangan</th><th>Status Pengecekan</th></tr>`;
+                    htmlTable += `<h2>DATA HASIL INVENTARISASI ASET (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
+                    htmlTable += `<table border="1"><tr style="background:#bae6fd;">
+                        <th>No</th>
+                        <th>Kode Barang</th>
+                        <th>Nomor Register</th>
+                        <th>Nama Barang</th>
+                        <th>Merk / Type</th>
+                        <th>Ukuran / CC</th>
+                        <th>Bahan</th>
+                        <th>Tahun Perolehan</th>
+                        <th>Kondisi Asal</th>
+                        <th>Lokasi Ruangan</th>
+                        <th>Waktu Inventarisasi</th>
+                    </tr>`;
                 }
 
                 filteredData.forEach((r, i) => {
@@ -794,13 +793,25 @@
                             <td>${r.ukuran_cc}</td>
                             <td>${r.bahan}</td>
                             <td>${r.tahun_perolehan}</td>
-                            <td></td> <!-- KONDISI DIKOSONGKAN SESUAI PERMINTAAN -->
-                            <td></td> <!-- KETERANGAN DIKOSONGKAN SESUAI PERMINTAAN -->
+                            <td></td> <!-- KONDISI KOSONG -->
+                            <td></td> <!-- KETERANGAN KOSONG -->
                             <td>${r.ruangan}</td>
                             <td>${r.status_inventarisasi}</td>
                         </tr>`;
                     } else {
-                        htmlTable += `<tr><td>${i+1}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td><td>${r.reg}</td><td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.ukuran_cc}</td><td>${r.bahan}</td><td>${r.tahun_perolehan}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.ruangan}</td><td>${r.status_inventarisasi}</td></tr>`;
+                        htmlTable += `<tr>
+                            <td>${i+1}</td>
+                            <td style='mso-number-format:"\\@";'>${r.kode_barang}</td>
+                            <td>${r.reg}</td>
+                            <td>${r.nama_barang}</td>
+                            <td>${r.merk_type}</td>
+                            <td>${r.ukuran_cc}</td>
+                            <td>${r.bahan}</td>
+                            <td>${r.tahun_perolehan}</td>
+                            <td>${r.cara_perolehan_kondisi}</td>
+                            <td>${r.ruangan}</td>
+                            <td>${r.status_inventarisasi}</td>
+                        </tr>`;
                     }
                 });
                 htmlTable += `</table></body></html>`;
@@ -809,16 +820,13 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = type === 'master' ? 'Rekap_Master_SIACEP.xls' : 'Rekap_KIR_SIACEP.xls';
+                a.download = type === 'master' ? 'Hasil_Inventarisasi_SIACEP.xls' : 'Hasil_KIR_SIACEP.xls';
                 document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
             } else { alert("Gagal mengambil data: " + (resData.message || "Data kosong")); }
         })
         .catch(err => { btn.innerHTML = oriText; btn.disabled = false; alert("Gangguan saat menarik data Excel."); });
     };
 
-    // =========================================================
-    // CETAK STIKER: MEMBUKA TAB BARU (TIDAK OTOMATIS NGE-PRINT)
-    // =========================================================
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
