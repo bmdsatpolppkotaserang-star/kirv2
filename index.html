@@ -134,16 +134,12 @@
     </div>
   </div>
 
-  <!-- MODAL BARANG NYASAR (Tunggal) - HTML dipertahankan agar tidak ada error referensi -->
   <div id="modalBarangNyasar" class="modal" role="dialog" aria-modal="true">
     <div class="modal-box" style="text-align: center;">
-      <div style="width: 56px; height: 56px; background: var(--warning-soft); color: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-right-left"></i></div>
-      <h3 style="margin: 0 0 6px 0; color: var(--warning); font-size: 16px; font-weight: 800;">Barang Nyasar / Beda Ruangan!</h3>
-      <p id="pesanBarangNyasar" style="margin: 0 0 16px 0; color: var(--text-muted); font-size: 12.5px;">Barang ini sebelumnya tercatat di ruangan lain. Yakin ingin memindahkannya ke ruangan ini?</p>
-      <div style="display: flex; gap: 8px;">
-        <button type="button" onclick="batalPindahRuangan()" class="btn btn-dark" style="flex: 1; padding: 10px; font-size: 12px;">Batal (Abaikan)</button>
-        <button type="button" onclick="konfirmasiPindahRuangan()" class="btn btn-warning" style="flex: 1; padding: 10px; font-size: 12px;"><i class="fa-solid fa-check"></i> Ya, Mutasikan</button>
-      </div>
+      <div style="width: 56px; height: 56px; background: var(--danger-soft); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-ban"></i></div>
+      <h3 style="margin: 0 0 6px 0; color: var(--danger); font-size: 18px; font-weight: 900;">DITOLAK!</h3>
+      <p style="margin: 0 0 20px 0; color: var(--text-muted); font-size: 14px; font-weight: 700;">Bukan Aset Ruangan Ini.</p>
+      <button type="button" onclick="document.getElementById('modalBarangNyasar').style.display='none'; siapkanHalamanScanner();" class="btn btn-dark" style="width: 100%; padding: 12px;">Kembali Memindai</button>
     </div>
   </div>
 
@@ -488,7 +484,7 @@
       const judul = document.getElementById("judulScanner"), subjudul = document.getElementById("subjudulScanner");
       const headerTeks = document.getElementById("teksModeAktif"), switchContainer = document.getElementById("wrapperSwitchBatch");
 
-      switchContainer.style.display = "none"; // Sembunyikan toggle, sistem yang tentukan otomatis
+      switchContainer.style.display = "none"; 
 
       if (modeAktif === 'KIR') {
         judul.innerHTML = `<i class="fa-solid fa-door-open" style="color:var(--kir);"></i> Pemetaan KIR`;
@@ -550,7 +546,6 @@
                   const rTujuan = ruanganAktif.trim().toUpperCase();
                   
                   if (rAsal !== "" && rAsal !== "-" && rAsal !== rTujuan) {
-                      // PENOLAKAN SESUAI PERMINTAAN
                       window.showToast("⚠️ Ditolak: Bukan Aset Ruangan Ini!");
                       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
                       return; 
@@ -631,7 +626,6 @@
       fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
       .then(res => res.json()).then(data => { 
         if (data.result === "need_confirmation") {
-          // PENOLAKAN SINGKAT SESUAI PERMINTAAN
           window.showToast("⚠️ Ditolak: Bukan Aset Ruangan Ini!");
           alert("DITOLAK!\nBukan Aset Ruangan Ini.");
           siapkanHalamanScanner();
@@ -931,7 +925,7 @@
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
-    // PEMBUATAN STIKER: DESAIN PROPORSI TABEL & FOOTER RESMI
+    // PEMBUATAN STIKER: DESAIN SESUAI SCREENSHOT
     window.cetakStikerMassal = async function (listKode) {
         let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
@@ -943,36 +937,54 @@
         let stikerHTML = `<!DOCTYPE html><html><head><title>Cetak Label QR</title>
         <style>
             * { box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; padding: 20px; margin: 0; background: #f8fafc; }
-            .print-btn-container { margin-bottom: 20px; text-align: center;}
+            body { font-family: 'Arial', sans-serif; padding: 20px; background: #f8fafc; margin: 0;}
+            .print-btn-container { margin-bottom: 20px; text-align: center; }
             .print-btn { padding: 10px 20px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
             .stiker-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-start; }
             
-            /* Box stiker diatur proporsional panjang */
-            .stiker-box { background: white; border: 2px solid #000; width: 85mm; padding: 10px; border-radius: 8px; break-inside: avoid; page-break-inside: avoid; color: #000; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); margin-bottom: 12px; }
+            .stiker-box { 
+                width: 85mm; 
+                background: white; 
+                border: 2px solid #1e293b; 
+                border-radius: 8px; 
+                padding: 8px 12px; 
+                break-inside: avoid; 
+                page-break-inside: avoid; 
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.1); 
+                margin-bottom: 12px;
+                display: flex;
+                flex-direction: column;
+            }
             
-            /* Header Kiri Tengah Kanan */
-            .stiker-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; }
-            .stiker-header img { width: 40px; height: 40px; object-fit: contain; }
-            .stiker-title { font-size: 12px; font-weight: 900; line-height: 1.2; text-align: center; flex: 1; margin: 0 5px; color: #000; }
+            .stiker-header { 
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between; 
+                border-bottom: 2px solid #1e3a8a; 
+                padding-bottom: 6px; 
+                margin-bottom: 8px; 
+            }
+            .stiker-header img { width: 35px; height: 35px; object-fit: contain; }
+            .stiker-title { text-align: center; flex: 1; margin: 0 5px; }
+            .stiker-title .pemerintah { font-size: 9px; font-weight: 700; color: #000; letter-spacing: 0.5px; margin-bottom: 2px; display: block;}
+            .stiker-title .dinas { font-size: 11px; font-weight: 900; color: #1e3a8a; letter-spacing: 0.5px; display: block;}
             
-            /* Isi Barcode dan Teks */
-            .stiker-body { display: flex; gap: 12px; align-items: center; }
-            .stiker-qr { width: 80px; height: 80px; flex-shrink: 0; }
+            .stiker-body { display: flex; gap: 12px; align-items: stretch; margin-bottom: 6px; }
+            .stiker-qr-wrapper { border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center;}
+            .stiker-qr { width: 65px; height: 65px; flex-shrink: 0; }
             
-            /* Detail Teks menggunakan Table agar titik dua (:) rapi */
-            .stiker-details { flex: 1; text-align: left; overflow: hidden; color: #000; }
-            .stiker-details table { width: 100%; border-collapse: collapse; }
-            .stiker-details td { vertical-align: top; font-size: 10px; font-weight: 700; padding-bottom: 3px; }
-            .stiker-details .kode { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 900; }
+            .stiker-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; }
+            .detail-group { display: flex; flex-direction: column; line-height: 1.2;}
+            .detail-label { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 1px;}
+            .detail-value { font-size: 11px; font-weight: 800; color: #0f172a; }
+            .value-kode { border: 1px dashed #94a3b8; padding: 3px 4px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11px; font-weight: 900; background: #f8fafc;}
             
-            /* Footer Label */
-            .stiker-footer { border-top: 1px solid #000; margin-top: 6px; padding-top: 4px; font-size: 9px; font-weight: 800; text-align: center; }
+            .stiker-footer { border-top: 1px solid #cbd5e1; padding-top: 6px; font-size: 8px; font-weight: 800; text-align: center; color: #0f172a; }
 
             @media print { 
                 body { padding: 0; background: white; }
                 .print-btn-container { display: none; } 
-                .stiker-box { box-shadow: none; border: 2px solid #000 !important; margin-bottom: 15px;}
+                .stiker-box { box-shadow: none; margin-bottom: 15px; border-color: #000; }
                 @page { margin: 10mm; }
             }
         </style>
@@ -1002,32 +1014,32 @@
             <div class="stiker-box">
                 <div class="stiker-header">
                     <img src="logo.png" onerror="this.style.display='none'">
-                    <div class="stiker-title">PEMERINTAH KOTA SERANG<br>SATPOL PP</div>
+                    <div class="stiker-title">
+                        <span class="pemerintah">PEMERINTAH KOTA SERANG</span>
+                        <span class="dinas">SATUAN POLISI PAMONG PRAJA</span>
+                    </div>
                     <img src="polpp.png" onerror="this.style.display='none'">
                 </div>
                 <div class="stiker-body">
-                    <img class="stiker-qr" src="${qrUrl}" alt="QR Code">
+                    <div class="stiker-qr-wrapper">
+                        <img class="stiker-qr" src="${qrUrl}" alt="QR Code">
+                    </div>
                     <div class="stiker-details">
-                        <table>
-                            <tr>
-                                <td style="width: 70px;">Kode Barang</td>
-                                <td style="width: 5px;">:</td>
-                                <td class="kode">${kd}</td>
-                            </tr>
-                            <tr>
-                                <td>Nama Barang</td>
-                                <td>:</td>
-                                <td>${namaVal}</td>
-                            </tr>
-                            <tr>
-                                <td>Tahun</td>
-                                <td>:</td>
-                                <td>${tahunVal}</td>
-                            </tr>
-                        </table>
+                        <div class="detail-group">
+                            <span class="detail-label">KODE BARANG</span>
+                            <span class="value-kode">${kd}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">NAMA BARANG</span>
+                            <span class="detail-value">${namaVal}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">TAHUN</span>
+                            <span class="detail-value">${tahunVal}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="stiker-footer">SISTEM INVENTARISASI ASET (SI-ACEP)</div>
+                <div class="stiker-footer">SI-ACEP — SATPOL PP KOTA SERANG</div>
             </div>`;
         }
 
