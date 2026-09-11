@@ -308,7 +308,6 @@
   </footer>
 
   <script>
-    // MAS ACEP: UBAH IP SESUAI LAPTOP ANDA DI SINI
     const CONFIG = {
       API_URL: "http://10.63.153.103/siacep/cek_aset.php", 
       SESSION_TIMEOUT_MS: 15 * 60 * 1000
@@ -739,7 +738,6 @@
             window.closeModalCetakLaporan();
 
             if(resData.result === 'success') {
-                // FILTER INTI: HANYA AMBIL DATA YANG SUDAH ADA STATUS INVENTARISASINYA
                 let filteredData = resData.data.filter(r => r.status_inventarisasi && r.status_inventarisasi.trim() !== "");
 
                 if(filteredData.length === 0) {
@@ -750,7 +748,6 @@
                 
                 if (type === 'kir') {
                     htmlTable += `<h2>DATA HASIL KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
-                    
                     htmlTable += `<table border="1"><tr style="background:#e2e8f0;">
                         <th>No</th>
                         <th>Nama Barang</th>
@@ -765,55 +762,48 @@
                         <th>Ruangan</th>
                         <th>Waktu inventarisasi</th>
                     </tr>`;
-                } else {
-                    htmlTable += `<h2>DATA HASIL INVENTARISASI ASET (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
-                    htmlTable += `<table border="1"><tr style="background:#bae6fd;">
-                        <th>No</th>
-                        <th>Kode Barang</th>
-                        <th>Nomor Register</th>
-                        <th>Nama Barang</th>
-                        <th>Merk / Type</th>
-                        <th>Ukuran / CC</th>
-                        <th>Bahan</th>
-                        <th>Tahun Perolehan</th>
-                        <th>Kondisi Asal</th>
-                        <th>Lokasi Ruangan</th>
-                        <th>Waktu Inventarisasi</th>
-                    </tr>`;
-                }
 
-                filteredData.forEach((r, i) => {
-                    if (type === 'kir') {
+                    filteredData.forEach((r, i) => {
                         htmlTable += `<tr>
                             <td>${i+1}</td>
-                            <td>${r.nama_barang}</td>
-                            <td>${r.merk_type}</td>
-                            <td>${r.reg}</td>
-                            <td style='mso-number-format:"\\@";'>${r.kode_barang}</td>
-                            <td>${r.ukuran_cc}</td>
-                            <td>${r.bahan}</td>
-                            <td>${r.tahun_perolehan}</td>
-                            <td></td> <!-- KONDISI KOSONG -->
-                            <td></td> <!-- KETERANGAN KOSONG -->
-                            <td>${r.ruangan}</td>
-                            <td>${r.status_inventarisasi}</td>
+                            <td>${r.nama_barang || ''}</td>
+                            <td>${r.merk_type || ''}</td>
+                            <td>${r.reg || ''}</td>
+                            <td style='mso-number-format:"\\@";'>${r.kode_barang || ''}</td>
+                            <td>${r.ukuran_cc || ''}</td>
+                            <td>${r.bahan || ''}</td>
+                            <td>${r.tahun_perolehan || ''}</td>
+                            <td></td>
+                            <td></td>
+                            <td>${r.ruangan || ''}</td>
+                            <td>${r.status_inventarisasi || ''}</td>
                         </tr>`;
-                    } else {
-                        htmlTable += `<tr>
-                            <td>${i+1}</td>
-                            <td style='mso-number-format:"\\@";'>${r.kode_barang}</td>
-                            <td>${r.reg}</td>
-                            <td>${r.nama_barang}</td>
-                            <td>${r.merk_type}</td>
-                            <td>${r.ukuran_cc}</td>
-                            <td>${r.bahan}</td>
-                            <td>${r.tahun_perolehan}</td>
-                            <td>${r.cara_perolehan_kondisi}</td>
-                            <td>${r.ruangan}</td>
-                            <td>${r.status_inventarisasi}</td>
-                        </tr>`;
-                    }
-                });
+                    });
+                } else {
+                    const dbColumns = Object.keys(filteredData[0]); 
+                    
+                    htmlTable += `<h2>DATA HASIL INVENTARISASI ASET (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
+                    htmlTable += `<table border="1"><tr style="background:#bae6fd;"><th>No</th>`;
+                    
+                    dbColumns.forEach(col => {
+                        htmlTable += `<th>${col.toUpperCase()}</th>`;
+                    });
+                    htmlTable += `</tr>`;
+
+                    filteredData.forEach((r, i) => {
+                        htmlTable += `<tr><td>${i+1}</td>`;
+                        dbColumns.forEach(col => {
+                            let cellVal = r[col] || "";
+                            if(col === 'kode_barang' || col === 'reg') {
+                                htmlTable += `<td style='mso-number-format:"\\@";'>${cellVal}</td>`;
+                            } else {
+                                htmlTable += `<td>${cellVal}</td>`;
+                            }
+                        });
+                        htmlTable += `</tr>`;
+                    });
+                }
+                
                 htmlTable += `</table></body></html>`;
 
                 const blob = new Blob([htmlTable], {type: 'application/vnd.ms-excel'});
@@ -843,10 +833,14 @@
         arrayKode.forEach(kd => {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
             stikerHTML += `
-            <div style="background: white; border: 2px solid #000; width: 170px; text-align: center; padding: 10px; border-radius: 8px; box-sizing: border-box; break-inside: avoid; margin-bottom: 15px; color: #000;">
-                <div style="font-size: 11px; font-weight: 900; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; line-height: 1.2;">SI-ACEP<br>SATPOL PP</div>
+            <div style="background: white; border: 2px solid #000; width: 180px; text-align: center; padding: 8px; border-radius: 8px; box-sizing: border-box; break-inside: avoid; margin-bottom: 15px; color: #000;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 6px;">
+                    <img src="logo.png" style="height: 26px; width: auto; object-fit: contain;" onerror="this.style.opacity='0'">
+                    <div style="font-size: 9.5px; font-weight: 900; line-height: 1.1; text-align: center;">SI-ACEP<br>SATPOL PP</div>
+                    <img src="polpp.png" style="height: 26px; width: auto; object-fit: contain;" onerror="this.style.opacity='0'">
+                </div>
                 <img src="${qrUrl}" style="width:110px; height:110px; margin: 0 auto; display: block;">
-                <div style="font-size: 11px; font-family: monospace; font-weight: bold; margin-top: 6px;">${kd}</div>
+                <div style="font-size: 10.5px; font-family: monospace; font-weight: bold; margin-top: 6px;">${kd}</div>
             </div>`;
         });
 
