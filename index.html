@@ -175,7 +175,7 @@
         <p id="subjudulScanner">Arahkan kamera ke label QR Aset.</p>
       </div>
 
-      <div class="switch-container" id="wrapperSwitchBatch">
+      <div class="switch-container" id="wrapperSwitchBatch" style="display: none;">
         <label class="switch">
           <input type="checkbox" id="toggleBatchMode" onchange="handleToggleBatchMode(this.checked)">
           <span class="slider"></span>
@@ -488,29 +488,32 @@
       const judul = document.getElementById("judulScanner"), subjudul = document.getElementById("subjudulScanner");
       const headerTeks = document.getElementById("teksModeAktif"), switchContainer = document.getElementById("wrapperSwitchBatch");
 
+      switchContainer.style.display = "none"; // Sembunyikan toggle, sistem yang tentukan otomatis
+
       if (modeAktif === 'KIR') {
         judul.innerHTML = `<i class="fa-solid fa-door-open" style="color:var(--kir);"></i> Pemetaan KIR`;
         subjudul.innerHTML = `Distribusi ruangan: <strong>${ruanganAktif.toUpperCase()}</strong>`;
         headerTeks.innerText = "ALUR: DISTRIBUSI RUANGAN (KIR)";
         document.getElementById("btnStartCamera").className = "btn btn-kir";
-        switchContainer.style.display = "flex";
-        switchContainer.className = "switch-container kir-mode";
+        
+        document.getElementById("toggleBatchMode").checked = true;
+        window.handleToggleBatchMode(true);
       } else if (modeAktif === 'INFO') {
         judul.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--info);"></i> Cek Informasi`;
         subjudul.innerHTML = `Mode baca. Data tidak akan disimpan.`;
         headerTeks.innerText = "ALUR: CEK INFORMASI ASET";
         document.getElementById("btnStartCamera").className = "btn btn-info";
-        switchContainer.style.display = "none";
-        if(isBatchMode) {
-           isBatchMode = false; document.getElementById("toggleBatchMode").checked = false; window.handleToggleBatchMode(false);
-        }
+        
+        document.getElementById("toggleBatchMode").checked = false;
+        window.handleToggleBatchMode(false);
       } else {
         judul.innerHTML = `<i class="fa-solid fa-qrcode" style="color:var(--primary);"></i> Pindai Global`;
         subjudul.innerHTML = `Pencatatan database utama (Master).`;
         headerTeks.innerText = "ALUR: DATABASE UTAMA";
         document.getElementById("btnStartCamera").className = "btn btn-primary";
-        switchContainer.style.display = "flex";
-        switchContainer.className = "switch-container";
+        
+        document.getElementById("toggleBatchMode").checked = true;
+        window.handleToggleBatchMode(true);
       }
       scannerAktif = true; window.mulaiKamera(); window.scrollTo({ top: 0, behavior: 'auto' });
     }
