@@ -76,21 +76,6 @@
     .modal-box { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 420px; }
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
     .app-footer { text-align: center; padding: 16px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
-
-    /* CSS KHUSUS UNTUK CETAK STIKER */
-    #printArea { display: none; }
-    @media print {
-        body * { visibility: hidden; }
-        #printArea, #printArea * { visibility: visible; }
-        #printArea { position: absolute; left: 0; top: 0; width: 100%; display: flex; flex-wrap: wrap; gap: 10px; background: white; }
-        .stiker { background: white; border: 2px solid #0f172a; width: 160px; text-align: center; padding: 10px; border-radius: 12px; box-sizing: border-box; break-inside: avoid; margin-bottom: 10px; }
-        .stiker-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 6px; margin-bottom: 8px; }
-        .stiker-header img { height: 26px; }
-        .stiker-title { font-size: 10px; font-weight: 900; line-height: 1.2; color: #0f172a; }
-        .stiker-qr { width: 100px; height: 100px; margin: 4px 0; }
-        .stiker-kode { font-size: 10px; font-family: monospace; font-weight: bold; margin-top: 4px;}
-        .stiker-nama { font-size: 11px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-    }
   </style>
 </head>
 <body>
@@ -248,7 +233,7 @@
       <textarea id="inputKodesStikerMassal" class="form-control" rows="4" placeholder="Ketik kode, pisahkan dengan koma..."></textarea>
       <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
         <button type="button" onclick="closeModalCetakStikerMassal()" class="btn btn-dark" style="flex: 1;">Batal</button>
-        <button type="button" onclick="eksekusiCetakStikerMassalModal()" class="btn btn-success" style="flex: 1;">Cetak</button>
+        <button type="button" onclick="eksekusiCetakStikerMassalModal()" class="btn btn-success" style="flex: 1;">Buka Stiker</button>
       </div>
     </div>
   </div>
@@ -266,9 +251,6 @@
       </div>
     </div>
   </div>
-
-  <!-- AREA KHUSUS CETAK HTML KE PRINTER -->
-  <div id="printArea"></div>
 
   <footer class="app-footer"><p><strong>SI-ACEP</strong> &copy; Satpol PP Kota Serang</p></footer>
 
@@ -318,7 +300,7 @@
       document.getElementById("btnStartCamera")?.addEventListener("click", () => { scannerAktif = true; window.mulaiKamera(); });
       document.getElementById("inputKodeManual")?.addEventListener("keypress", (e) => { if (e.key === "Enter") window.eksekusiCariManual(); });
       document.getElementById("btnHapusInventaris")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) window.hapusDataAset(kode); });
-      document.getElementById("btnCetakQR")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) { document.getElementById("inputKodesStikerMassal").value = kode; window.eksekusiCetakStikerMassalModal(); } });
+      document.getElementById("btnCetakQR")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) { document.getElementById("inputKodesStikerMassal").value = kode; window.openModalCetakStikerMassal(); } });
     });
 
     window.eksekusiCariManual = function() {
@@ -441,29 +423,15 @@
       fetch(`${CONFIG.API_URL}?action=hapus_semua_inventaris`).then(res => res.json()).then(data => { alert(data.message); window.closeModalHapusSemua(); });
     };
 
-    // PERBAIKAN FITUR EXCEL & STIKER (Murni Client-Side JS)
+    // NAVIGASI LANGSUNG UNTUK EXCEL DAN STIKER
     window.openModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "flex"; };
     window.closeModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "none"; };
     
     window.eksekusiCetakLaporan = function () {
-      const type = document.getElementById("selectJenisDokumen").value === "ALL_EXCEL" ? "master" : "kir";
-      const btn = document.getElementById("btnEksporUnduh"); btn.innerText = "Memproses...";
-      
-      fetch(`${CONFIG.API_URL}?action=get_all_data&type=${type}`)
-      .then(res => res.json()).then(data => {
-        btn.innerText = "Unduh Berkas"; window.closeModalCetakLaporan();
-        if(data.result === 'success') {
-            let htmlTable = `<table border="1"><tr><th>No</th><th>Ruangan</th><th>Kode Barang</th><th>Register</th><th>Nama Barang</th><th>Merk/Type</th><th>Kondisi & Status</th><th>Status Inventarisasi</th></tr>`;
-            data.data.forEach((r, i) => { htmlTable += `<tr><td>${i+1}</td><td>${r.ruangan}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td><td>${r.reg}</td><td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.status_inventarisasi}</td></tr>`; });
-            htmlTable += `</table>`;
-            
-            const blob = new Blob([htmlTable], {type: 'application/vnd.ms-excel'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = type === 'master' ? 'Rekap_Master_SIACEP.xls' : 'Rekap_KIR_SIACEP.xls';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        } else { alert("Gagal mengambil data."); }
-      });
+        const type = document.getElementById("selectJenisDokumen").value;
+        const actionAPI = type === "ALL_EXCEL" ? "export_hasil_excel" : "export_kir_excel";
+        window.location.href = `${CONFIG.API_URL}?action=${actionAPI}`;
+        window.closeModalCetakLaporan();
     };
 
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const k = localStorage.getItem("print_kode"); if(k) document.getElementById("inputKodesStikerMassal").value = k; };
@@ -472,26 +440,10 @@
     window.eksekusiCetakStikerMassalModal = function () {
         const input = document.getElementById("inputKodesStikerMassal").value;
         let arrayKode = input.split(",").map(k => k.trim()).filter(Boolean);
-        if (arrayKode.length === 0) return;
+        if (arrayKode.length === 0) return alert("Masukkan minimal 1 kode.");
         
-        const printArea = document.getElementById("printArea"); printArea.innerHTML = "";
-        arrayKode.forEach(kd => {
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
-            let nama = memoryCache.has(kd) ? memoryCache.get(kd).nama : "Aset Satpol PP";
-            printArea.innerHTML += `
-            <div class="stiker">
-                <div class="stiker-header">
-                    <img src="logo.png">
-                    <div class="stiker-title">SI-ACEP<br>SATPOL PP</div>
-                    <img src="polpp.png">
-                </div>
-                <img class="stiker-qr" src="${qrUrl}">
-                <div class="stiker-kode">${kd}</div>
-                <div class="stiker-nama">${nama}</div>
-            </div>`;
-        });
+        window.location.href = `${CONFIG.API_URL}?action=cetak_stiker_massal&kodes=${encodeURIComponent(arrayKode.join(","))}`;
         window.closeModalCetakStikerMassal();
-        setTimeout(() => { window.print(); }, 500); // Jeda sejenak agar logo termuat
     };
   </script>
 </body>
