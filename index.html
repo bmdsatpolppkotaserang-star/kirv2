@@ -68,7 +68,7 @@
     .btn-dark { background-color: var(--dark-panel); color: white; }
     .btn-success { background-color: var(--success); color: white; }
     .btn-indigo { background-color: var(--indigo); color: white; }
-    .btn-warning { background-color: var(--warning); color: white; }
+    .btn-warning { background-color: var(--warning); color: #000; }
     .divider { position: relative; text-align: center; margin: 22px 0 16px 0; width: 100%; }
     .divider::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: var(--border); }
     .divider span { position: relative; background: #FFFFFF; padding: 0 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
@@ -79,7 +79,7 @@
     .info-card { background-color: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
     .info-badge-status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; }
     .status-good { background-color: var(--success-soft); color: #065f46; border: 1px solid #a7f3d0; }
-    .status-bad { background-color: var(--warning-soft); color: #92400e; border: 1px solid #fde68a; }
+    .status-bad { background-color: var(--danger-soft); color: #991b1b; border: 1px solid #fca5a5; }
     .info-detail-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
     .info-item { display: flex; flex-direction: column; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
     .info-item:last-child { border-bottom: none; }
@@ -93,6 +93,7 @@
     .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
     .history-item:hover { background-color: var(--primary-soft); border-color: #bae6fd; }
     .app-footer { text-align: center; padding: 16px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+    #toastBox { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background-color: var(--danger-dark); color: white; padding: 12px 20px; border-radius: 30px; font-size: 12.5px; font-weight: 800; z-index: 9999; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; white-space: nowrap; transition: opacity 0.3s ease; }
   </style>
 </head>
 <body>
@@ -129,6 +130,19 @@
       <div style="display: flex; gap: 8px;">
         <button type="button" onclick="resetAplikasi()" class="btn btn-dark" style="flex: 1;">Kembali</button>
         <button type="button" onclick="setRuanganAktif()" class="btn btn-kir" style="flex: 2;">Konfirmasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BARANG NYASAR (Tunggal) -->
+  <div id="modalBarangNyasar" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-box" style="text-align: center;">
+      <div style="width: 56px; height: 56px; background: var(--warning-soft); color: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-right-left"></i></div>
+      <h3 style="margin: 0 0 6px 0; color: var(--warning); font-size: 16px; font-weight: 800;">Barang Nyasar / Beda Ruangan!</h3>
+      <p id="pesanBarangNyasar" style="margin: 0 0 16px 0; color: var(--text-muted); font-size: 12.5px;">Barang ini sebelumnya tercatat di ruangan lain. Yakin ingin memindahkannya ke ruangan ini?</p>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" onclick="batalPindahRuangan()" class="btn btn-dark" style="flex: 1; padding: 10px; font-size: 12px;">Batal (Abaikan)</button>
+        <button type="button" onclick="konfirmasiPindahRuangan()" class="btn btn-warning" style="flex: 1; padding: 10px; font-size: 12px;"><i class="fa-solid fa-check"></i> Ya, Mutasikan</button>
       </div>
     </div>
   </div>
@@ -318,9 +332,11 @@
     });
 
     let scannerAktif = true, html5QrCode = null, isTorchOn = false, sessionTimer = null;
-    let isBatchMode = false, batchSet = new Set(), lastScanTime = 0, lastScanCode = "";
+    let isBatchMode = false, batchSet = new Set(), fetchingSet = new Set();
+    let lastScanTime = 0, lastScanCode = "";
     let modeAktif = null, ruanganAktif = "";
     let isPengurusBarang = false; 
+    window.pendingReallocationData = null; 
 
     const memoryCache = new Map();
     const scanBeepSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUtvT18AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8=");
@@ -353,6 +369,13 @@
         let db = await this.init();
         db.transaction("queue", "readwrite").objectStore("queue").clear();
       }
+    };
+
+    window.showToast = function(msg) {
+      let tb = document.getElementById("toastBox");
+      if(!tb) { tb = document.createElement("div"); tb.id = "toastBox"; document.body.appendChild(tb); }
+      tb.innerHTML = msg; tb.style.display = "block"; tb.style.opacity = "1";
+      setTimeout(() => { tb.style.opacity = "0"; setTimeout(() => tb.style.display = "none", 300); }, 3500);
     };
 
     window.matikanKamera = function() {
@@ -390,7 +413,7 @@
             triggerSuccessFeedback();
 
             if (isBatchMode) { 
-              tambahKeBatch(decodedText); 
+              window.tambahKeBatch(decodedText); 
             } else if (modeAktif === 'INFO') { 
               scannerAktif = false; 
               window.matikanKamera(); 
@@ -422,7 +445,7 @@
       triggerSuccessFeedback();
       
       if (isBatchMode) { 
-        tambahKeBatch(kodeInput); 
+        window.tambahKeBatch(kodeInput); 
         document.getElementById("inputKodeManual").value = ""; 
       } else if (modeAktif === 'INFO') { 
         scannerAktif = false; 
@@ -499,10 +522,45 @@
       else { batchC.classList.remove("active"); divM.style.display = "block"; boxM.style.display = "block"; hist.style.display = "block"; }
     };
 
-    function tambahKeBatch(kodeData) { 
-      const kB = ekstrakKodeMurni(kodeData); 
-      if (kB && !batchSet.has(kB)) { batchSet.add(kB); renderBatchList(); } 
-    }
+    // FUNGSI CEK BARANG NYASAR OTOMATIS SAAT PINDAI MASAL
+    window.tambahKeBatch = async function(kodeData) {
+      const kB = ekstrakKodeMurni(kodeData);
+      if (!kB || batchSet.has(kB) || fetchingSet.has(kB)) return;
+
+      if (modeAktif === 'KIR' && navigator.onLine) {
+          fetchingSet.add(kB);
+          const listUl = document.getElementById("batchList");
+          const tempId = "temp-" + kB.replace(/[^a-zA-Z0-9]/g, '');
+          
+          listUl.innerHTML += `<li class="batch-item" id="${tempId}">
+            <span style="font-family: monospace; font-weight: 800; color: var(--warning);"><i class="fa-solid fa-spinner fa-spin"></i> Memvalidasi ${kB}...</span>
+          </li>`;
+          
+          try {
+              const res = await fetch(`${CONFIG.API_URL}?action=get_detail&kode=${encodeURIComponent(kB)}`);
+              const data = await res.json();
+              document.getElementById(tempId)?.remove();
+              fetchingSet.delete(kB);
+
+              if (data.result === "found") {
+                  const rAsal = (data.ruangan_aset || "").trim().toUpperCase();
+                  const rTujuan = ruanganAktif.trim().toUpperCase();
+                  
+                  if (rAsal !== "" && rAsal !== "-" && rAsal !== rTujuan) {
+                      window.showToast(`⚠️ Ditolak: Kode [${kB}] tercatat di ${rAsal}`);
+                      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+                      return; // STOP! Jangan masukkan ke antrean Batch
+                  }
+              }
+          } catch (e) {
+              document.getElementById(tempId)?.remove();
+              fetchingSet.delete(kB);
+          }
+      }
+
+      batchSet.add(kB); 
+      renderBatchList();
+    };
 
     window.clearBatchItems = function() { 
       if(batchSet.size > 0 && confirm("Konfirmasi untuk membersihkan seluruh antrean saat ini?")) { batchSet.clear(); renderBatchList(); } 
@@ -568,17 +626,45 @@
       fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
       .then(res => res.json()).then(data => { 
         if (data.result === "need_confirmation") {
-          if (confirm(data.message)) {
-            bodyParams.append("force", "true"); 
-            document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px 10px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:36px; color:${temaWarna};"></i><p style="margin-top:12px; font-weight:700; font-size:14px;">Realokasi Ruangan...</p></div>`;
-            fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
-            .then(res2 => res2.json()).then(data2 => { memoryCache.delete(kodeBersih); window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, data2.result === "success"); });
-          } else { alert("Operasi pemetaan dibatalkan oleh user."); siapkanHalamanScanner(); }
-          return;
+          window.pendingReallocationData = { kode: kodeBersih, ruangan: ruanganAktif, action: actionAPI };
+          document.getElementById("pesanBarangNyasar").innerText = data.message;
+          document.getElementById("modalBarangNyasar").style.display = "flex";
+          return; 
         }
         memoryCache.delete(kodeBersih); window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, data.result === "success"); 
       })
       .catch(err => { window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, false); });
+    };
+
+    window.batalPindahRuangan = function() {
+        document.getElementById("modalBarangNyasar").style.display = "none";
+        window.pendingReallocationData = null;
+        window.showToast("Dibatalkan: Barang tidak dipindahkan.");
+        siapkanHalamanScanner();
+    };
+
+    window.konfirmasiPindahRuangan = function() {
+        document.getElementById("modalBarangNyasar").style.display = "none";
+        if (!window.pendingReallocationData) return;
+
+        const { kode, ruangan, action } = window.pendingReallocationData;
+        const bodyParams = new URLSearchParams();
+        bodyParams.append("action", action);
+        bodyParams.append("kode", kode);
+        bodyParams.append("ruangan", ruangan);
+        bodyParams.append("force", "true"); 
+
+        document.getElementById("page-scanner").style.display = "none";
+        document.getElementById("page-informasi").style.display = "block";
+        document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px 10px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:36px; color:var(--warning);"></i><p style="margin-top:12px; font-weight:700; font-size:14px;">Memutasi Ruangan...</p></div>`;
+
+        fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
+        .then(res2 => res2.json()).then(data2 => { 
+            memoryCache.delete(kode); 
+            window.prosesCekDetailAset(kode, isPengurusBarang, true, data2.result === "success"); 
+        }).catch(err => { 
+            window.prosesCekDetailAset(kode, isPengurusBarang, true, false); 
+        });
     };
 
     async function prosesSinkronisasiOtomatis() {
@@ -656,6 +742,9 @@
           else { const isTerinventaris = (data.sudah_inventaris === true || isSuccessSave); bannerHTML = `<div style="margin-bottom:12px;text-align:center;"><span class="info-badge-status ${isTerinventaris ? 'status-good' : 'status-bad'}"><i class="fa-solid ${isTerinventaris ? 'fa-circle-check' : 'fa-clock'}"></i> ${isTerinventaris ? 'DATA MASTER: TERVERIFIKASI' : 'BELUM TERVERIFIKASI (PERIODE INI)'}</span></div>`; }
 
           let teksRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? data.ruangan_aset.toUpperCase() : "BELUM DIALOKASIKAN";
+          if (isSuccessSave && modeAktif === 'KIR' && data.ruangan_aset !== ruanganAktif.toUpperCase()) {
+            teksRuangan = ruanganAktif.toUpperCase() + " <span style='font-size:9px;'>(MUTASI BARU)</span>";
+          }
           let warnaRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? "var(--kir)" : "var(--danger)";
           let btnClass = modeAktif === 'KIR' ? 'btn-kir' : (modeAktif === 'INFO' ? 'btn-info' : 'btn-primary');
 
@@ -780,21 +869,37 @@
                         </tr>`;
                     });
                 } else {
-                    const dbColumns = Object.keys(filteredData[0]); 
-                    
                     htmlTable += `<h2>DATA HASIL INVENTARISASI ASET (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
-                    htmlTable += `<table border="1"><tr style="background:#bae6fd;"><th>No</th>`;
-                    
-                    dbColumns.forEach(col => {
-                        htmlTable += `<th>${col.toUpperCase()}</th>`;
-                    });
-                    htmlTable += `</tr>`;
+                    htmlTable += `<table border="1"><tr style="background:#bae6fd;">
+                        <th>No</th>
+                        <th>Kode Barang/ID Barang/ID Awal</th>
+                        <th>Reg.</th>
+                        <th>Nama Barang</th>
+                        <th>Merk/Type</th>
+                        <th>Ukuran/CC</th>
+                        <th>Bahan</th>
+                        <th>Tahun Perolehan</th>
+                        <th>Pabrik</th>
+                        <th>Rangka</th>
+                        <th>Mesin</th>
+                        <th>Polisi</th>
+                        <th>BPKB</th>
+                        <th>Cara Perolehan/ Sumber Dana/ Status Barang/ Kondisi/Penggunaan</th>
+                        <th>Jumlah/Harga Satuan</th>
+                        <th>Harga</th>
+                        <th>Tgl. Buku/No. BAST/Tgl. BAST/ID Penerimaan/Status Aset</th>
+                        <th>Keterangan</th>
+                        <th>Status Inventarisasi</th>
+                        <th>Waktu Inventarisasi</th>
+                        <th>Lokasi</th>
+                        <th>Foto</th>
+                    </tr>`;
 
                     filteredData.forEach((r, i) => {
                         htmlTable += `<tr><td>${i+1}</td>`;
-                        dbColumns.forEach(col => {
+                        Object.keys(r).forEach(col => {
                             let cellVal = r[col] || "";
-                            if(col === 'kode_barang' || col === 'reg') {
+                            if(col.toLowerCase().includes('kode') || col.toLowerCase().includes('reg') || (typeof cellVal === 'string' && cellVal.startsWith('0'))) {
                                 htmlTable += `<td style='mso-number-format:"\\@";'>${cellVal}</td>`;
                             } else {
                                 htmlTable += `<td>${cellVal}</td>`;
@@ -824,29 +929,50 @@
         let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
 
-        let stikerHTML = `<!DOCTYPE html><html><head><title>Cetak Label QR</title></head><body style="font-family: Arial, sans-serif; padding: 20px;">
-        <div style="margin-bottom: 20px;">
-            <button onclick="window.print()" style="padding: 10px 20px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">🖨️ Cetak Sekarang</button>
+        let stikerHTML = `<!DOCTYPE html><html><head><title>Cetak Label QR</title>
+        <style>
+            * { box-sizing: border-box; }
+            body { font-family: Arial, sans-serif; padding: 20px; margin: 0; background: #f8fafc; }
+            .print-btn-container { margin-bottom: 20px; }
+            .print-btn { padding: 10px 20px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+            .stiker-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-start; }
+            .stiker-box { background: white; border: 2px solid #000; width: 175px; text-align: center; padding: 10px; border-radius: 8px; break-inside: avoid; page-break-inside: avoid; color: #000; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+            
+            .stiker-header { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; }
+            .stiker-header img { max-width: 32px; max-height: 32px; object-fit: contain; }
+            .stiker-title { font-size: 11px; font-weight: 900; line-height: 1.2; text-align: center; margin: 0; padding: 0; color: #000; }
+            
+            .stiker-qr { width: 110px; height: 110px; margin: 0 auto; display: block; }
+            .stiker-kode { font-size: 11px; font-family: 'Courier New', monospace; font-weight: bold; margin-top: 8px; word-break: break-all; line-height: 1.1; color: #000; }
+            
+            @media print { 
+                body { padding: 0; background: white; }
+                .print-btn-container { display: none; } 
+                .stiker-box { box-shadow: none; border: 2px solid #000 !important; }
+                @page { margin: 10mm; }
+            }
+        </style>
+        </head><body>
+        <div class="print-btn-container">
+            <button class="print-btn" onclick="window.print()">🖨️ Cetak Sekarang</button>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; width: 100%;">`;
+        <div class="stiker-container">`;
 
         arrayKode.forEach(kd => {
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
             stikerHTML += `
-            <div style="background: white; border: 2px solid #000; width: 180px; text-align: center; padding: 8px; border-radius: 8px; box-sizing: border-box; break-inside: avoid; margin-bottom: 15px; color: #000;">
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 6px;">
-                    <img src="logo.png" style="height: 26px; width: auto; object-fit: contain;" onerror="this.style.opacity='0'">
-                    <div style="font-size: 9.5px; font-weight: 900; line-height: 1.1; text-align: center;">SI-ACEP<br>SATPOL PP</div>
-                    <img src="polpp.png" style="height: 26px; width: auto; object-fit: contain;" onerror="this.style.opacity='0'">
+            <div class="stiker-box">
+                <div class="stiker-header">
+                    <div style="display: flex; justify-content: flex-start;"><img src="logo.png" onerror="this.style.display='none'"></div>
+                    <div class="stiker-title">SI-ACEP<br>SATPOL PP</div>
+                    <div style="display: flex; justify-content: flex-end;"><img src="polpp.png" onerror="this.style.display='none'"></div>
                 </div>
-                <img src="${qrUrl}" style="width:110px; height:110px; margin: 0 auto; display: block;">
-                <div style="font-size: 10.5px; font-family: monospace; font-weight: bold; margin-top: 6px;">${kd}</div>
+                <img class="stiker-qr" src="${qrUrl}" alt="QR Code">
+                <div class="stiker-kode">${kd}</div>
             </div>`;
         });
 
-        stikerHTML += `</div>
-        <style>@media print { button { display: none; } body { padding: 0 !important; margin: 0; } }</style>
-        </body></html>`;
+        stikerHTML += `</div></body></html>`;
         
         let printWin = window.open('', '_blank');
         printWin.document.write(stikerHTML);
