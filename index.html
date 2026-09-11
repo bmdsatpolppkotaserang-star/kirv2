@@ -13,15 +13,13 @@
       --kir: #059669; --kir-hover: #047857; --kir-soft: #d1fae5;
       --info: #6366f1; --info-soft: #e0e7ff; --bg: #f8fafc; --card-bg: #ffffff; 
       --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0; 
-      --success: #059669; --success-soft: #d1fae5; --danger: #ef4444; 
-      --danger-dark: #991b1b; --danger-soft: #fee2e2; --warning: #d97706; 
-      --indigo: #4f46e5; --dark-panel: #1e293b; --radius: 16px;
+      --success: #059669; --danger: #ef4444; --danger-dark: #991b1b; 
+      --warning: #d97706; --indigo: #4f46e5; --dark-panel: #1e293b; --radius: 16px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--bg); color: var(--text); line-height: 1.5; padding-bottom: 30px; }
-    .network-banner { background-color: #334155; color: #fff; font-size: 11px; font-weight: 700; text-align: center; padding: 8px 12px; display: none; align-items: center; justify-content: center; gap: 6px; }
-    .network-banner.offline { background-color: var(--danger); display: flex; }
-    .network-banner.queue { background-color: var(--warning); display: flex; color: #000; flex-wrap: wrap; }
+    
+    /* Layout Aplikasi */
     .app-header { background-color: var(--card-bg); padding: 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
     .header-container { display: flex; align-items: center; justify-content: space-between; max-width: 500px; margin: 0 auto; }
     .header-logo-left img, .header-logo-right img { height: 40px; width: auto; object-fit: contain; }
@@ -29,30 +27,11 @@
     .header-title h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
     .header-title p { margin: 2px 0 0 0; font-size: 9px; color: var(--text-muted); font-weight: 700; }
     .main-container { max-width: 440px; margin: 20px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
-    .content-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; transition: all 0.3s ease; }
-    .card-title h2 { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .card-title p { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
-    #overlayMode { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 16px; }
-    .mode-card { border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; margin-bottom: 12px; background: white; }
-    .mode-card h3 { margin: 0 0 4px 0; font-size: 16px; }
-    .mode-card p { margin: 0; font-size: 12px; color: var(--text-muted); }
-    .scanner-box { width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .content-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; }
+    
+    /* Scanner & Form */
     #reader { border: 2px dashed #cbd5e1 !important; border-radius: var(--radius) !important; overflow: hidden !important; background-color: #0f172a !important; padding: 4px !important; width: 100% !important; }
     #reader video { object-fit: cover !important; border-radius: 12px !important; width: 100% !important; max-height: 240px !important; }
-    .scanner-controls { display: flex; gap: 10px; margin-top: 16px; width: 100%; }
-    .switch-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; padding: 12px; background: var(--primary-soft); border-radius: var(--radius); border: 1px solid #bae6fd; }
-    .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
-    input:checked + .slider { background-color: var(--primary); }
-    input:checked + .slider:before { transform: translateX(26px); }
-    .switch-label { font-size: 13px; font-weight: 700; color: var(--primary); }
-    #batchResultContainer { display: none; width: 100%; margin-top: 16px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    #batchResultContainer.active { display: block; }
-    .batch-header { background: #f1f5f9; padding: 10px 14px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; }
-    .batch-list { max-height: 180px; overflow-y: auto; list-style: none; }
-    .batch-item { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; }
     .btn { border: none; padding: 13px 18px; border-radius: 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-kir { background: var(--kir); color: white; }
@@ -62,48 +41,52 @@
     .btn-dark { background-color: var(--dark-panel); color: white; }
     .btn-success { background-color: var(--success); color: white; }
     .btn-indigo { background-color: var(--indigo); color: white; }
-    .divider { position: relative; text-align: center; margin: 22px 0 16px 0; width: 100%; }
-    .divider::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: var(--border); }
-    .divider span { position: relative; background: #FFFFFF; padding: 0 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .input-group { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
     .form-control { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 13.5px; outline: none; background: #f8fafc; }
-    .info-card { background-color: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    
+    /* Modal & List */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 16px; }
+    .modal-box { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 420px; }
+    .mode-card { border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; margin-bottom: 12px; background: white; }
+    
     .info-detail-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
     .info-item { display: flex; flex-direction: column; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
     .info-label { font-size: 10.5px; color: var(--text-muted); font-weight: 800; }
     .info-value { font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 2px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 16px; }
-    .modal-box { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 420px; }
-    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
-    .app-footer { text-align: center; padding: 16px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+
+    /* PENGATURAN AREA CETAK STIKER */
+    #printArea { display: none; }
+    @media print {
+        body > *:not(#printArea) { display: none !important; }
+        #printArea { display: block !important; width: 100%; }
+        @page { margin: 10px; }
+    }
   </style>
 </head>
 <body>
 
  <div id="overlayMode">
     <div class="modal-box" style="text-align: center;">
-      <img src="logo.png" alt="Logo" style="height: 50px; margin-bottom: 16px;">
+      <img src="logo.png" alt="Logo" style="height: 50px; margin-bottom: 16px;" onerror="this.style.display='none'">
       <h2 style="margin-bottom: 4px;">Pilih Mode Kerja</h2>
       <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 24px;">Tentukan alur pencatatan aset saat ini.</p>
       
-      <div class="mode-card info" onclick="pilihMode('INFO')">
+      <div class="mode-card" onclick="pilihMode('INFO')">
         <h3 style="color: var(--info);"><i class="fa-solid fa-circle-info"></i> Cek Informasi Aset</h3>
-        <p>Hanya melihat detail aset tanpa mengubah/menyimpan data.</p>
+        <p style="margin:0;font-size:12px;color:gray;">Hanya melihat detail aset tanpa menyimpan.</p>
       </div>
       <div class="mode-card" onclick="pilihMode('GLOBAL')">
         <h3 style="color: var(--primary);"><i class="fa-solid fa-globe"></i> Inventarisasi Aset</h3>
-        <p>Pencatatan data induk barang secara menyeluruh.</p>
+        <p style="margin:0;font-size:12px;color:gray;">Pencatatan data induk (Master).</p>
       </div>
-      <div class="mode-card kir" onclick="pilihMode('KIR')">
+      <div class="mode-card" onclick="pilihMode('KIR')">
         <h3 style="color: var(--kir);"><i class="fa-solid fa-door-open"></i> Buat KIR</h3>
-        <p>Pemetaan dan pendataan barang khusus ruangan.</p>
+        <p style="margin:0;font-size:12px;color:gray;">Pemetaan barang khusus ruangan.</p>
       </div>
     </div>
   </div>
 
   <div id="overlayInputRuangan" class="modal">
     <div class="modal-box" style="text-align: center;">
-      <div style="font-size: 32px; color: var(--kir); margin-bottom: 12px;"><i class="fa-solid fa-door-open"></i></div>
       <h3 style="margin-bottom: 8px;">Detail Ruangan</h3>
       <input type="text" id="inputNamaRuangan" class="form-control" placeholder="Contoh: Ruang Kasat" style="text-align: center; font-weight: 700; margin-bottom: 16px;">
       <div style="display: flex; gap: 8px;">
@@ -113,92 +96,55 @@
     </div>
   </div>
 
-  <div id="networkBanner" class="network-banner">
-    <div style="display: flex; align-items: center; gap: 6px;"><i class="fa-solid fa-wifi"></i> <span id="networkStatusText">Memeriksa koneksi...</span></div>
-    <div id="networkActionButtons" style="display: none; gap: 6px;">
-      <button onclick="prosesSinkronisasiOtomatis()" style="padding: 4px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; background: #0f172a; color: #fff; border: none;">Coba Lagi</button>
-      <button onclick="paksaHapusAntrean()" style="padding: 4px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; background: #dc2626; color: #fff; border: none;">Hapus</button>
-    </div>
-  </div>
-
   <header class="app-header">
     <div class="header-container">
-      <div class="header-logo-left"><img src="logo.png"></div>
+      <div class="header-logo-left"><img src="logo.png" onerror="this.style.opacity='0'"></div>
       <div class="header-title">
         <h1>SI-ACEP</h1>
         <p id="teksModeAktif">INISIALISASI SISTEM...</p>
       </div>
-      <div class="header-logo-right"><img src="polpp.png"></div>
+      <div class="header-logo-right"><img src="polpp.png" onerror="this.style.opacity='0'"></div>
     </div>
   </header>
 
   <main class="main-container">
     <section id="page-scanner" class="content-card" style="display: none;">
-      <div class="card-title">
-        <h2 id="judulScanner"><i class="fa-solid fa-qrcode" style="color: var(--primary);"></i> Pindai QR Code</h2>
-        <p id="subjudulScanner">Arahkan kamera ke label QR Aset.</p>
-      </div>
-
-      <div class="switch-container" id="wrapperSwitchBatch">
-        <label class="switch"><input type="checkbox" id="toggleBatchMode" onchange="handleToggleBatchMode(this.checked)"><span class="slider"></span></label>
-        <span class="switch-label">Pindai Beruntun (Massal)</span>
-      </div>
-
+      <h2 id="judulScanner" style="font-size:16px; margin-bottom: 16px;"><i class="fa-solid fa-qrcode"></i> Pindai QR Code</h2>
       <div class="scanner-box">
         <div id="reader"></div>
-        <div class="scanner-controls">
+        <div style="display:flex; gap:10px; margin-top:16px; width:100%;">
           <button id="btnStartCamera" type="button" class="btn btn-primary" style="flex: 1;"><i class="fa-solid fa-camera"></i> Buka Kamera</button>
-          <button id="btnStopCamera" type="button" class="btn btn-danger" style="flex: 1; display: none;" onclick="window.matikanKamera()"><i class="fa-solid fa-circle-stop"></i> Tutup Kamera</button>
+          <button id="btnStopCamera" type="button" class="btn btn-danger" style="flex: 1; display: none;" onclick="window.matikanKamera()"><i class="fa-solid fa-circle-stop"></i> Tutup</button>
         </div>
-        
-        <div id="batchResultContainer">
-          <div class="batch-header">
-            <span>Antrean: <span id="batchItemCount">0</span></span>
-            <button type="button" onclick="clearBatchItems()" style="background:none; border:none; color:var(--danger); font-size:11px; font-weight:700;">Bersihkan</button>
-          </div>
-          <ul class="batch-list" id="batchList"></ul>
-          <div style="padding: 10px;">
-            <button id="btnSimpanMassal" type="button" onclick="eksekusiSimpanMassal()" class="btn btn-success" style="width: 100%;"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan Antrean</button>
-          </div>
-        </div>
-
-        <div class="divider" id="dividerManual"><span>Pencarian Manual</span></div>
-        <div class="manual-input-box" id="boxManualInput">
-          <div class="input-group">
-            <input type="text" id="inputKodeManual" class="form-control" placeholder="Ketik Kode Aset...">
-            <button id="btnCariManual" type="button" class="btn btn-dark" style="width: auto;" onclick="eksekusiCariManual()"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <div style="width: 100%; margin-top: 20px;">
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <input type="text" id="inputKodeManual" class="form-control" placeholder="Atau ketik manual...">
+            <button type="button" class="btn btn-dark" onclick="eksekusiCariManual()"><i class="fa-solid fa-magnifying-glass"></i></button>
           </div>
         </div>
       </div>
-
-      <div id="sectionHistori" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-          <h3 style="font-size: 12px; font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Pemindaian</h3>
-        </div>
-        <div id="scanHistoryContainer"></div>
-      </div>
-
-      <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; display: flex; gap: 8px;">
-        <button type="button" onclick="resetAplikasi()" class="btn btn-danger" style="flex: 1; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i> Menu Utama</button>
-        <button type="button" onclick="openPinModal()" class="btn btn-dark" style="flex: 1; font-size: 12px;"><i class="fa-solid fa-user-shield"></i> Panel Admin</button>
+      <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px; display: flex; gap: 8px;">
+        <button type="button" onclick="resetAplikasi()" class="btn btn-danger" style="flex: 1; font-size: 12px;"><i class="fa-solid fa-arrow-left"></i> Utama</button>
+        <button type="button" onclick="openPinModal()" class="btn btn-dark" style="flex: 1; font-size: 12px;"><i class="fa-solid fa-user-shield"></i> Admin</button>
       </div>
     </section>
 
     <section id="page-informasi" class="content-card" style="display: none;">
-      <div class="card-title"><h2><i class="fa-solid fa-file-lines" style="color: var(--primary);"></i> Detail Aset</h2></div>
-      <div class="info-card"><div id="infoDetailAset"></div></div>
+      <h2 style="font-size:16px; margin-bottom: 16px;"><i class="fa-solid fa-file-lines"></i> Detail Aset</h2>
+      <div style="background-color: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;">
+          <div id="infoDetailAset"></div>
+      </div>
 
-      <div id="panelPetugas" style="display: none; margin-top: 16px; background-color: #ffffff; border: 1.5px solid var(--primary-soft); border-radius: var(--radius); padding: 16px;">
+      <div id="panelPetugas" style="display: none; margin-top: 16px; background-color: #ffffff; border: 1.5px solid #bae6fd; border-radius: var(--radius); padding: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-          <h3 style="margin: 0; font-size: 14px;"><i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Kendali Admin</h3>
-          <button type="button" onclick="closePanelPetugas()" class="btn btn-danger" style="padding: 4px 10px; font-size: 11px; width: auto;">Tutup</button>
+          <h3 style="margin: 0; font-size: 14px;"><i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Panel Admin</h3>
+          <button type="button" onclick="closePanelPetugas()" class="btn btn-danger" style="padding: 4px 10px; font-size: 11px;">Tutup</button>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <button id="btnHapusInventaris" type="button" class="btn btn-danger" style="font-size: 12px; padding: 10px;"><i class="fa-solid fa-eraser"></i> Hapus Status</button>
-          <button id="btnCetakQR" type="button" class="btn btn-indigo" style="font-size: 12px; padding: 10px;"><i class="fa-solid fa-qrcode"></i> Cetak Label</button>
-          <button id="btnCetakMassal" type="button" onclick="openModalCetakStikerMassal()" class="btn btn-success" style="font-size: 12px; padding: 10px; grid-column: span 2;"><i class="fa-solid fa-print"></i> Cetak Label Massal</button>
-          <button id="btnDownloadRekap" type="button" onclick="openModalCetakLaporan()" class="btn btn-dark" style="grid-column: span 2; font-size: 12px; padding: 10px;"><i class="fa-solid fa-file-excel"></i> Ekspor Data (Excel)</button>
-          <button id="btnHapusSemuaInventaris" type="button" onclick="openModalHapusSemua()" class="btn btn-danger-dark" style="grid-column: span 2; font-size: 12px; padding: 10px; margin-top: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> Reset Seluruh Status</button>
+          <button type="button" onclick="hapusDataAset()" class="btn btn-danger" style="font-size: 12px; padding: 10px;"><i class="fa-solid fa-eraser"></i> Hapus Status</button>
+          <button type="button" onclick="openModalCetakStikerMassal(true)" class="btn btn-indigo" style="font-size: 12px; padding: 10px;"><i class="fa-solid fa-qrcode"></i> Cetak Label</button>
+          <button type="button" onclick="openModalCetakStikerMassal()" class="btn btn-success" style="font-size: 12px; padding: 10px; grid-column: span 2;"><i class="fa-solid fa-print"></i> Cetak Label Massal</button>
+          <button type="button" onclick="openModalCetakLaporan()" class="btn btn-dark" style="grid-column: span 2; font-size: 12px; padding: 10px;"><i class="fa-solid fa-file-excel"></i> Ekspor Excel</button>
         </div>
       </div>
     </section>
@@ -210,68 +156,45 @@
       <input type="password" id="inputPinPetugas" maxlength="6" placeholder="123456" style="width: 100%; padding: 10px; font-size: 22px; text-align: center; letter-spacing: 8px; border: 2px solid var(--border); border-radius: 12px; margin-bottom: 16px;">
       <div style="display: flex; gap: 8px;">
         <button type="button" onclick="closePinModal()" class="btn btn-dark" style="flex: 1;">Batal</button>
-        <button type="button" onclick="verifikasiPin()" class="btn btn-primary" style="flex: 1;">Verifikasi</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalHapusSemua" class="modal">
-    <div class="modal-box" style="text-align: center;">
-      <h3 style="color: var(--danger-dark); margin-bottom: 12px;">Reset Seluruh Status?</h3>
-      <p style="font-size: 12px; margin-bottom: 16px;">Hanya status yang dihapus. Data ruangan aman.</p>
-      <input type="text" id="inputKonfirmasiHapusSemua" class="form-control" placeholder="Ketik HAPUS..." style="text-align: center; font-weight: 700; margin-bottom: 16px;">
-      <div style="display: flex; gap: 8px;">
-        <button type="button" onclick="closeModalHapusSemua()" class="btn btn-dark" style="flex: 1;">Batal</button>
-        <button type="button" onclick="eksekusiHapusSemuaData()" class="btn btn-danger-dark" style="flex: 1;">Reset</button>
+        <button type="button" onclick="verifikasiPin()" class="btn btn-primary" style="flex: 1;">Login</button>
       </div>
     </div>
   </div>
 
   <div id="modalCetakStikerMassal" class="modal">
     <div class="modal-box">
-      <h3 style="margin-bottom: 12px;">Cetak Label Massal</h3>
-      <textarea id="inputKodesStikerMassal" class="form-control" rows="4" placeholder="Ketik kode, pisahkan dengan koma..."></textarea>
+      <h3 style="margin-bottom: 12px;">Cetak Label</h3>
+      <textarea id="inputKodesStikerMassal" class="form-control" rows="4" placeholder="Ketik kode aset..."></textarea>
       <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
         <button type="button" onclick="closeModalCetakStikerMassal()" class="btn btn-dark" style="flex: 1;">Batal</button>
-        <button type="button" onclick="eksekusiCetakStikerMassalModal()" class="btn btn-success" style="flex: 1;">Buka Stiker</button>
+        <button type="button" onclick="eksekusiCetakStiker()" class="btn btn-success" style="flex: 1;">Cetak</button>
       </div>
     </div>
   </div>
 
   <div id="modalCetakLaporan" class="modal">
     <div class="modal-box">
-      <h3 style="margin-bottom: 14px;">Ekspor Data Excel</h3>
+      <h3 style="margin-bottom: 14px;">Ekspor Excel</h3>
       <select id="selectJenisDokumen" class="form-control">
-        <option value="ALL_EXCEL">📊 Data Master (Global)</option>
-        <option value="KIR_EXCEL">🚪 Data Ruangan (KIR)</option>
+        <option value="master">📊 Data Master (Global)</option>
+        <option value="kir">🚪 Data Ruangan (KIR)</option>
       </select>
       <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
         <button type="button" onclick="closeModalCetakLaporan()" class="btn btn-dark" style="flex: 1;">Batal</button>
-        <button type="button" id="btnEksporUnduh" onclick="eksekusiCetakLaporan()" class="btn btn-primary" style="flex: 1;">Unduh Berkas</button>
+        <button type="button" id="btnEksporUnduh" onclick="eksekusiEksporExcel()" class="btn btn-primary" style="flex: 1;">Unduh</button>
       </div>
     </div>
   </div>
 
-  <footer class="app-footer"><p><strong>SI-ACEP</strong> &copy; Satpol PP Kota Serang</p></footer>
+  <div id="printArea"></div>
 
   <script>
-    const CONFIG = {
-      API_URL: "http://10.63.153.103/siacep/cek_aset.php" // <-- PASTIKAN GANTI DENGAN IP LAPTOP ANDA
-    };
+    const CONFIG = { API_URL: "http://10.63.153.103//siacep/cek_aset.php" }; // GANTI DENGAN IP LAPTOP
 
-    let scannerAktif = true, html5QrCode = null, isBatchMode = false, batchSet = new Set(), lastScanTime = 0, lastScanCode = "";
-    let modeAktif = null, ruanganAktif = "", isPengurusBarang = false; 
-    const memoryCache = new Map();
-    const scanBeepSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUtvT18AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8=");
-
-    // SYSTEM CORE (Kamera & UI Dasar)
+    let html5QrCode = null, scannerAktif = true, modeAktif = null, ruanganAktif = "";
+    
     window.matikanKamera = function() {
-      if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-          document.getElementById("btnStartCamera").style.display = "inline-flex";
-          document.getElementById("btnStopCamera").style.display = "none";
-        }).catch(err => {});
-      }
+      if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop().then(() => { document.getElementById("btnStartCamera").style.display = "inline-flex"; document.getElementById("btnStopCamera").style.display = "none"; }).catch(e => {}); }
     };
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -282,34 +205,19 @@
         scannerStarting = true;
         html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: { width: 250, height: 250 } }, (decodedText) => {
             if (!scannerAktif) return;
-            const now = Date.now();
-            if (decodedText === lastScanCode && now - lastScanTime < 2000) return;
-            lastScanCode = decodedText; lastScanTime = now;
-            try{ scanBeepSound.play(); navigator.vibrate([100,50,100]); }catch(e){}
-
-            if (isBatchMode) { tambahKeBatch(decodedText); } 
-            else if (modeAktif === 'INFO') { scannerAktif = false; window.matikanKamera(); window.prosesCekDetailAset(decodedText); } 
-            else { scannerAktif = false; window.matikanKamera(); window.autoSimpanSesuaiMode(decodedText); }
+            scannerAktif = false; window.matikanKamera();
+            if ("vibrate" in navigator) navigator.vibrate([100,50,100]);
+            
+            if (modeAktif === 'INFO') { window.prosesCekDetailAset(decodedText); } 
+            else { window.autoSimpanSesuaiMode(decodedText); }
           }, () => {}).then(() => {
           scannerStarting = false;
-          document.getElementById("btnStartCamera").style.display = "none";
-          document.getElementById("btnStopCamera").style.display = "inline-flex";
+          document.getElementById("btnStartCamera").style.display = "none"; document.getElementById("btnStopCamera").style.display = "inline-flex";
         }).catch(err => { scannerStarting = false; });
       };
-
       document.getElementById("btnStartCamera")?.addEventListener("click", () => { scannerAktif = true; window.mulaiKamera(); });
       document.getElementById("inputKodeManual")?.addEventListener("keypress", (e) => { if (e.key === "Enter") window.eksekusiCariManual(); });
-      document.getElementById("btnHapusInventaris")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) window.hapusDataAset(kode); });
-      document.getElementById("btnCetakQR")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) { document.getElementById("inputKodesStikerMassal").value = kode; window.openModalCetakStikerMassal(); } });
     });
-
-    window.eksekusiCariManual = function() {
-      const kodeInput = document.getElementById("inputKodeManual").value.trim();
-      if (!kodeInput) return;
-      if (isBatchMode) { tambahKeBatch(kodeInput); document.getElementById("inputKodeManual").value = ""; } 
-      else if (modeAktif === 'INFO') { scannerAktif = false; window.matikanKamera(); window.prosesCekDetailAset(kodeInput); document.getElementById("inputKodeManual").value = ""; } 
-      else { scannerAktif = false; window.matikanKamera(); window.autoSimpanSesuaiMode(kodeInput); document.getElementById("inputKodeManual").value = ""; }
-    };
 
     window.pilihMode = function(mode) {
       modeAktif = mode; document.getElementById("overlayMode").style.display = "none";
@@ -323,127 +231,157 @@
     };
 
     window.resetAplikasi = function() {
-      modeAktif = null; ruanganAktif = ""; isBatchMode = false; document.getElementById("toggleBatchMode").checked = false; window.handleToggleBatchMode(false);
-      window.matikanKamera();
-      document.getElementById("overlayInputRuangan").style.display = "none";
-      document.getElementById("page-scanner").style.display = "none";
-      document.getElementById("page-informasi").style.display = "none";
-      document.getElementById("overlayMode").style.display = "flex";
-      document.getElementById("teksModeAktif").innerText = "SISTEM SIAP...";
+      modeAktif = null; ruanganAktif = ""; window.matikanKamera();
+      document.getElementById("overlayInputRuangan").style.display = "none"; document.getElementById("page-scanner").style.display = "none"; document.getElementById("page-informasi").style.display = "none";
+      document.getElementById("overlayMode").style.display = "flex"; document.getElementById("teksModeAktif").innerText = "SISTEM SIAP...";
     };
 
     function siapkanHalamanScanner() {
       document.getElementById("page-scanner").style.display = "block"; document.getElementById("page-informasi").style.display = "none";
-      const judul = document.getElementById("judulScanner");
-      if (modeAktif === 'KIR') { judul.innerHTML = `<i class="fa-solid fa-door-open" style="color:var(--kir);"></i> Pemetaan KIR`; document.getElementById("wrapperSwitchBatch").style.display = "flex"; } 
-      else if (modeAktif === 'INFO') { judul.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--info);"></i> Cek Informasi`; document.getElementById("wrapperSwitchBatch").style.display = "none"; isBatchMode = false; document.getElementById("toggleBatchMode").checked = false;} 
-      else { judul.innerHTML = `<i class="fa-solid fa-qrcode" style="color:var(--primary);"></i> Pindai Global`; document.getElementById("wrapperSwitchBatch").style.display = "flex"; }
       scannerAktif = true; window.mulaiKamera();
     }
 
-    window.handleToggleBatchMode = function (isChecked) {
-      isBatchMode = isChecked;
-      if (isChecked) { document.getElementById("batchResultContainer").classList.add("active"); document.getElementById("dividerManual").style.display = "none"; document.getElementById("boxManualInput").style.display = "none"; } 
-      else { document.getElementById("batchResultContainer").classList.remove("active"); document.getElementById("dividerManual").style.display = "block"; document.getElementById("boxManualInput").style.display = "block"; }
-    };
-
-    function tambahKeBatch(kodeData) { if (kodeData && !batchSet.has(kodeData)) { batchSet.add(kodeData); renderBatchList(); } }
-    window.clearBatchItems = function() { batchSet.clear(); renderBatchList(); };
-    window.hapusItemBatch = function(kodeHapus) { batchSet.delete(kodeHapus); renderBatchList(); }
-    function renderBatchList() {
-      const listUl = document.getElementById("batchList"); document.getElementById("batchItemCount").innerText = batchSet.size; listUl.innerHTML = "";
-      batchSet.forEach(k => { listUl.innerHTML += `<li class="batch-item"><span>${k}</span><button onclick="hapusItemBatch('${k}')" style="background:#fee2e2; border:none; padding:4px 8px;">Hapus</button></li>`; });
-    }
-
-    window.eksekusiSimpanMassal = function() {
-      if (batchSet.size === 0) return;
-      const actionAPI = modeAktif === 'KIR' ? "update_kir_massal" : "update_inventaris_massal";
-      const payloadData = { action: actionAPI, kodes: Array.from(batchSet) };
-      if (modeAktif === 'KIR') payloadData.ruangan = ruanganAktif;
-
-      fetch(CONFIG.API_URL, { method: "POST", body: JSON.stringify(payloadData) }).then(res => res.json()).then(data => {
-        if (data.result === "success") { alert(data.message); batchSet.clear(); renderBatchList(); } else { alert("Gagal"); }
-      });
+    window.eksekusiCariManual = function() {
+      const kodeInput = document.getElementById("inputKodeManual").value.trim();
+      if (!kodeInput) return;
+      scannerAktif = false; window.matikanKamera();
+      if (modeAktif === 'INFO') { window.prosesCekDetailAset(kodeInput); } else { window.autoSimpanSesuaiMode(kodeInput); }
+      document.getElementById("inputKodeManual").value = "";
     };
 
     window.autoSimpanSesuaiMode = function(kodeQR) {
       document.getElementById("page-scanner").style.display = "none"; document.getElementById("page-informasi").style.display = "block";
-      document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px 10px;">Merekam Data...</div>`;
+      document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px;">Menyimpan...</div>`;
       
       const actionAPI = modeAktif === 'KIR' ? "update_kir" : "update_inventaris";
-      const bodyParams = new URLSearchParams(); bodyParams.append("action", actionAPI); bodyParams.append("kode", kodeQR);
-      if (modeAktif === 'KIR') bodyParams.append("ruangan", ruanganAktif);
+      const formData = new URLSearchParams(); formData.append("action", actionAPI); formData.append("kode", kodeQR);
+      if (modeAktif === 'KIR') formData.append("ruangan", ruanganAktif);
 
-      fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
-      .then(res => res.json()).then(data => { window.prosesCekDetailAset(kodeQR, isPengurusBarang, true, data.result === "success"); });
+      fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: formData.toString() })
+      .then(res => res.json()).then(data => { window.prosesCekDetailAset(kodeQR); });
     };
 
-    window.prosesCekDetailAset = function (kodeQR, tampilkanHarga = false, forceRefresh = false, isSuccessSave = false) {
+    window.prosesCekDetailAset = function (kodeQR) {
       document.getElementById("page-scanner").style.display = "none"; document.getElementById("page-informasi").style.display = "block";
+      document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px;">Membaca Aset...</div>`;
+      
       fetch(`${CONFIG.API_URL}?action=get_detail&kode=${encodeURIComponent(kodeQR)}`)
-      .then(r => r.json()).then(data => { 
-        if (data && data.result === "found") {
-          localStorage.setItem("print_kode", data.kode); memoryCache.set(data.kode, data);
-          let teksRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? data.ruangan_aset.toUpperCase() : "BELUM DIALOKASIKAN";
-          
+      .then(r => r.json()).then(res => { 
+        if (res.result === "found") {
+          const d = res.data;
+          localStorage.setItem("print_kode", d.kode_barang);
           document.getElementById("infoDetailAset").innerHTML = `
           <div class="info-detail-grid">
-            <div class="info-item"><span class="info-label">KODE</span><span class="info-value">${data.kode}</span></div>
-            <div class="info-item"><span class="info-label">NAMA</span><span class="info-value">${data.nama}</span></div>
-            <div class="info-item"><span class="info-label">RUANGAN</span><span class="info-value">${teksRuangan}</span></div>
-            <div class="info-item"><span class="info-label">STATUS</span><span class="info-value">${data.status_aset || 'BELUM DIVERIFIKASI'}</span></div>
+            <div class="info-item"><span class="info-label">KODE BARANG</span><span class="info-value" style="font-family:monospace; color:var(--primary); font-size:16px;">${d.kode_barang}</span></div>
+            <div class="info-item"><span class="info-label">NAMA ASET</span><span class="info-value">${d.nama_barang}</span></div>
+            <div class="info-item"><span class="info-label">LOKASI RUANGAN</span><span class="info-value" style="color:var(--kir); font-weight:800;">${d.ruangan || 'BELUM DIALOKASIKAN'}</span></div>
+            <div class="info-item"><span class="info-label">STATUS</span><span class="info-value">${d.status_inventarisasi || 'BELUM DIVERIFIKASI'}</span></div>
           </div>
-          <button type="button" onclick="siapkanHalamanScanner()" class="btn btn-primary" style="width: 100%; margin-top:16px;">Pindai Berikutnya</button>`;
+          <button type="button" onclick="siapkanHalamanScanner()" class="btn btn-primary" style="width: 100%; margin-top:20px;">Lanjutkan Pindai</button>`;
         } else { 
-            document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center;">Aset tidak ditemukan.</div><button onclick="siapkanHalamanScanner()" class="btn btn-dark" style="width:100%; margin-top:10px;">Kembali</button>`; 
+            document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center;color:red;font-weight:bold;">Aset tidak ditemukan.</div><button onclick="siapkanHalamanScanner()" class="btn btn-dark" style="width:100%; margin-top:10px;">Kembali</button>`; 
         }
       });
     };
 
     window.openPinModal = function () { document.getElementById("modalPin").style.display = "flex"; };
     window.closePinModal = function () { document.getElementById("modalPin").style.display = "none"; };
-    window.verifikasiPin = function () {
-      fetch(`${CONFIG.API_URL}?action=verify_pin&pin=${encodeURIComponent(document.getElementById("inputPinPetugas").value)}`)
-      .then(res => res.json()).then(data => {
-        if (data.result === "success") { window.closePinModal(); document.getElementById("panelPetugas").style.display = "block"; isPengurusBarang = true; } 
-        else { alert("PIN Salah"); }
-      });
-    };
-    window.closePanelPetugas = function () { document.getElementById("panelPetugas").style.display = "none"; isPengurusBarang = false; };
     
-    // PERBAIKAN RESET STATUS
-    window.hapusDataAset = function(kodeBarang) {
-      if (!confirm(`Hapus status inventaris aset ini?`)) return;
+    window.verifikasiPin = function () {
+      const pin = document.getElementById("inputPinPetugas").value;
+      fetch(`${CONFIG.API_URL}?action=verify_pin&pin=${encodeURIComponent(pin)}`).then(r => r.json()).then(data => {
+        if (data.result === "success") { window.closePinModal(); document.getElementById("panelPetugas").style.display = "block"; } 
+        else { alert("PIN Salah atau Server Gagal Dihubungi"); }
+      }).catch(e => alert("Gagal koneksi ke API"));
+    };
+    window.closePanelPetugas = function () { document.getElementById("panelPetugas").style.display = "none"; };
+    
+    window.hapusDataAset = function() {
+      const kodeBarang = localStorage.getItem("print_kode");
+      if (!confirm("Hapus status aset ini?")) return;
       fetch(`${CONFIG.API_URL}?action=hapus_inventaris&kode=${encodeURIComponent(kodeBarang)}`).then(res => res.json()).then(data => { alert(data.message); window.prosesCekDetailAset(kodeBarang); });
     };
-    window.openModalHapusSemua = function() { document.getElementById("modalHapusSemua").style.display = "flex"; };
-    window.closeModalHapusSemua = function() { document.getElementById("modalHapusSemua").style.display = "none"; };
-    window.eksekusiHapusSemuaData = function() {
-      if (document.getElementById("inputKonfirmasiHapusSemua").value !== "HAPUS") return alert('Ketik HAPUS');
-      fetch(`${CONFIG.API_URL}?action=hapus_semua_inventaris`).then(res => res.json()).then(data => { alert(data.message); window.closeModalHapusSemua(); });
-    };
 
-    // NAVIGASI LANGSUNG UNTUK EXCEL DAN STIKER
+    // EKSPOR EXCEL (DENGAN HEADER STANDAR KIR/KIB)
     window.openModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "flex"; };
     window.closeModalCetakLaporan = function () { document.getElementById("modalCetakLaporan").style.display = "none"; };
-    
-    window.eksekusiCetakLaporan = function () {
-        const type = document.getElementById("selectJenisDokumen").value;
-        const actionAPI = type === "ALL_EXCEL" ? "export_hasil_excel" : "export_kir_excel";
-        window.location.href = `${CONFIG.API_URL}?action=${actionAPI}`;
-        window.closeModalCetakLaporan();
+    window.eksekusiEksporExcel = function () {
+      const type = document.getElementById("selectJenisDokumen").value;
+      const btn = document.getElementById("btnEksporUnduh"); btn.innerText = "Mengambil Data...";
+      
+      fetch(`${CONFIG.API_URL}?action=get_all_data&type=${type}`)
+      .then(res => res.json()).then(resData => {
+        btn.innerText = "Unduh Berkas"; window.closeModalCetakLaporan();
+        if(resData.result === 'success') {
+            let htmlTable = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>`;
+            
+            if (type === 'kir') {
+                htmlTable += `<h2>KARTU INVENTARIS RUANGAN (KIR) - SATPOL PP KOTA SERANG</h2>`;
+                htmlTable += `<table border="1"><tr style="background:#e2e8f0;">
+                    <th>No</th><th>Ruangan</th><th>Kode Barang</th><th>Nomor Register</th>
+                    <th>Nama / Jenis Barang</th><th>Merk / Type</th><th>Ukuran / CC</th>
+                    <th>Bahan</th><th>Tahun Perolehan</th><th>Kondisi (B/KB/RB)</th>
+                    <th>Status Inventarisasi / Keterangan</th></tr>`;
+            } else {
+                htmlTable += `<h2>DATA MASTER INVENTARIS (GLOBAL) - SATPOL PP KOTA SERANG</h2>`;
+                htmlTable += `<table border="1"><tr style="background:#bae6fd;">
+                    <th>No</th><th>Kode Barang</th><th>Nomor Register</th><th>Nama Barang</th>
+                    <th>Merk / Type</th><th>Ukuran / CC</th><th>Bahan</th><th>Tahun</th>
+                    <th>Kondisi</th><th>Lokasi Ruangan</th><th>Status Pengecekan Terakhir</th></tr>`;
+            }
+
+            resData.data.forEach((r, i) => { 
+                if (type === 'kir') {
+                    htmlTable += `<tr><td>${i+1}</td><td>${r.ruangan}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td>
+                    <td>${r.reg}</td><td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.ukuran_cc}</td>
+                    <td>${r.bahan}</td><td>${r.tahun_perolehan}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.status_inventarisasi}</td></tr>`;
+                } else {
+                    htmlTable += `<tr><td>${i+1}</td><td style='mso-number-format:"\\@";'>${r.kode_barang}</td><td>${r.reg}</td>
+                    <td>${r.nama_barang}</td><td>${r.merk_type}</td><td>${r.ukuran_cc}</td><td>${r.bahan}</td>
+                    <td>${r.tahun_perolehan}</td><td>${r.cara_perolehan_kondisi}</td><td>${r.ruangan}</td><td>${r.status_inventarisasi}</td></tr>`;
+                }
+            });
+            htmlTable += `</table></body></html>`;
+            
+            const blob = new Blob([htmlTable], {type: 'application/vnd.ms-excel'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = type === 'master' ? 'Rekap_Master_SIACEP.xls' : 'Rekap_KIR_SIACEP.xls';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        } else { alert("Gagal mengambil data dari database."); }
+      }).catch(err => { btn.innerText = "Unduh Berkas"; alert("Koneksi bermasalah."); });
     };
 
-    window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const k = localStorage.getItem("print_kode"); if(k) document.getElementById("inputKodesStikerMassal").value = k; };
+    // CETAK STIKER
+    window.openModalCetakStikerMassal = function (isSatu = false) { 
+        document.getElementById("modalCetakStikerMassal").style.display = "flex"; 
+        if(isSatu) document.getElementById("inputKodesStikerMassal").value = localStorage.getItem("print_kode"); 
+    };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
-    window.eksekusiCetakStikerMassalModal = function () {
+    window.eksekusiCetakStiker = function () {
         const input = document.getElementById("inputKodesStikerMassal").value;
         let arrayKode = input.split(",").map(k => k.trim()).filter(Boolean);
-        if (arrayKode.length === 0) return alert("Masukkan minimal 1 kode.");
+        if (arrayKode.length === 0) return;
         
-        window.location.href = `${CONFIG.API_URL}?action=cetak_stiker_massal&kodes=${encodeURIComponent(arrayKode.join(","))}`;
+        const printArea = document.getElementById("printArea"); 
+        let stikerHTML = `<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;">`;
+        
+        arrayKode.forEach(kd => {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
+            stikerHTML += `
+            <div style="background: white; border: 2px solid #000; width: 170px; text-align: center; padding: 10px; border-radius: 8px; box-sizing: border-box; break-inside: avoid; margin-bottom: 15px;">
+                <div style="font-size: 11px; font-weight: 900; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; font-family: Arial, sans-serif;">SI-ACEP<br>SATPOL PP</div>
+                <img src="${qrUrl}" style="width:110px; height:110px;">
+                <div style="font-size: 11px; font-family: monospace; font-weight: bold; margin-top: 6px;">${kd}</div>
+            </div>`;
+        });
+        
+        stikerHTML += `</div>`;
+        printArea.innerHTML = stikerHTML;
         window.closeModalCetakStikerMassal();
+        
+        setTimeout(() => { window.print(); }, 1000); 
     };
   </script>
 </body>
