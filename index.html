@@ -134,19 +134,6 @@
     </div>
   </div>
 
-  <!-- MODAL BARANG NYASAR (Tunggal) -->
-  <div id="modalBarangNyasar" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-box" style="text-align: center;">
-      <div style="width: 56px; height: 56px; background: var(--warning-soft); color: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-right-left"></i></div>
-      <h3 style="margin: 0 0 6px 0; color: var(--warning); font-size: 16px; font-weight: 800;">Barang Nyasar / Beda Ruangan!</h3>
-      <p id="pesanBarangNyasar" style="margin: 0 0 16px 0; color: var(--text-muted); font-size: 12.5px;">Barang ini sebelumnya tercatat di ruangan lain. Yakin ingin memindahkannya ke ruangan ini?</p>
-      <div style="display: flex; gap: 8px;">
-        <button type="button" onclick="batalPindahRuangan()" class="btn btn-dark" style="flex: 1; padding: 10px; font-size: 12px;">Batal (Abaikan)</button>
-        <button type="button" onclick="konfirmasiPindahRuangan()" class="btn btn-warning" style="flex: 1; padding: 10px; font-size: 12px;"><i class="fa-solid fa-check"></i> Ya, Mutasikan</button>
-      </div>
-    </div>
-  </div>
-
   <div id="networkBanner" class="network-banner">
     <div style="display: flex; align-items: center; gap: 6px;">
       <i class="fa-solid fa-wifi"></i> <span id="networkStatusText">Memeriksa koneksi...</span>
@@ -291,7 +278,7 @@
       </div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button type="button" onclick="closeModalCetakStikerMassal()" class="btn btn-dark" style="padding: 10px 14px; font-size: 12px; flex: 1;">Batal</button>
-        <button type="button" onclick="eksekusiCetakStikerMassalModal()" class="btn btn-success" style="padding: 10px 14px; font-size: 12px; flex: 1;"><i class="fa-solid fa-print"></i> Proses Cetak</button>
+        <button type="button" id="btnEksekusiCetak" onclick="eksekusiCetakStikerMassalModal()" class="btn btn-success" style="padding: 10px 14px; font-size: 12px; flex: 1;"><i class="fa-solid fa-print"></i> Proses Cetak</button>
       </div>
     </div>
   </div>
@@ -336,7 +323,6 @@
     let lastScanTime = 0, lastScanCode = "";
     let modeAktif = null, ruanganAktif = "";
     let isPengurusBarang = false; 
-    window.pendingReallocationData = null; 
 
     const memoryCache = new Map();
     const scanBeepSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUtvT18AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8=");
@@ -390,11 +376,7 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       updateNetworkStatus(); renderScanHistory(); pingWarmupServer();
-      
-      if (navigator.onLine) {
-        prosesSinkronisasiOtomatis();
-      }
-
+      if (navigator.onLine) { prosesSinkronisasiOtomatis(); }
       if (document.getElementById("reader")) html5QrCode = new Html5Qrcode("reader");
       let scannerStarting = false;
 
@@ -415,13 +397,9 @@
             if (isBatchMode) { 
               window.tambahKeBatch(decodedText); 
             } else if (modeAktif === 'INFO') { 
-              scannerAktif = false; 
-              window.matikanKamera(); 
-              window.prosesCekDetailAset(decodedText); 
+              scannerAktif = false; window.matikanKamera(); window.prosesCekDetailAset(decodedText); 
             } else { 
-              scannerAktif = false; 
-              window.matikanKamera(); 
-              window.autoSimpanSesuaiMode(decodedText); 
+              scannerAktif = false; window.matikanKamera(); window.autoSimpanSesuaiMode(decodedText); 
             }
           }, () => {}
         ).then(() => {
@@ -429,7 +407,7 @@
           document.getElementById("btnStartCamera").style.display = "none";
           document.getElementById("btnStopCamera").style.display = "inline-flex";
           document.getElementById("btnTorch").style.display = "inline-flex";
-        }).catch(err => { scannerStarting = false; console.error("Kamera Gagal:", err); });
+        }).catch(err => { scannerStarting = false; });
       };
 
       document.getElementById("btnStartCamera")?.addEventListener("click", () => { scannerAktif = true; window.mulaiKamera(); });
@@ -443,21 +421,9 @@
       const kodeInput = document.getElementById("inputKodeManual").value.trim();
       if (!kodeInput) return alert("Silakan masukkan Kode Aset yang valid.");
       triggerSuccessFeedback();
-      
-      if (isBatchMode) { 
-        window.tambahKeBatch(kodeInput); 
-        document.getElementById("inputKodeManual").value = ""; 
-      } else if (modeAktif === 'INFO') { 
-        scannerAktif = false; 
-        window.matikanKamera(); 
-        window.prosesCekDetailAset(kodeInput); 
-        document.getElementById("inputKodeManual").value = ""; 
-      } else { 
-        scannerAktif = false; 
-        window.matikanKamera(); 
-        window.autoSimpanSesuaiMode(kodeInput); 
-        document.getElementById("inputKodeManual").value = ""; 
-      }
+      if (isBatchMode) { window.tambahKeBatch(kodeInput); document.getElementById("inputKodeManual").value = ""; } 
+      else if (modeAktif === 'INFO') { scannerAktif = false; window.matikanKamera(); window.prosesCekDetailAset(kodeInput); document.getElementById("inputKodeManual").value = ""; } 
+      else { scannerAktif = false; window.matikanKamera(); window.autoSimpanSesuaiMode(kodeInput); document.getElementById("inputKodeManual").value = ""; }
     };
 
     window.pilihMode = function(mode) {
@@ -493,24 +459,20 @@
         subjudul.innerHTML = `Distribusi ruangan: <strong>${ruanganAktif.toUpperCase()}</strong>`;
         headerTeks.innerText = "ALUR: DISTRIBUSI RUANGAN (KIR)";
         document.getElementById("btnStartCamera").className = "btn btn-kir";
-        switchContainer.style.display = "flex";
-        switchContainer.className = "switch-container kir-mode";
+        switchContainer.style.display = "flex"; switchContainer.className = "switch-container kir-mode";
       } else if (modeAktif === 'INFO') {
         judul.innerHTML = `<i class="fa-solid fa-circle-info" style="color:var(--info);"></i> Cek Informasi`;
         subjudul.innerHTML = `Mode baca. Data tidak akan disimpan.`;
         headerTeks.innerText = "ALUR: CEK INFORMASI ASET";
         document.getElementById("btnStartCamera").className = "btn btn-info";
         switchContainer.style.display = "none";
-        if(isBatchMode) {
-           isBatchMode = false; document.getElementById("toggleBatchMode").checked = false; window.handleToggleBatchMode(false);
-        }
+        if(isBatchMode) { isBatchMode = false; document.getElementById("toggleBatchMode").checked = false; window.handleToggleBatchMode(false); }
       } else {
         judul.innerHTML = `<i class="fa-solid fa-qrcode" style="color:var(--primary);"></i> Pindai Global`;
         subjudul.innerHTML = `Pencatatan database utama (Master).`;
         headerTeks.innerText = "ALUR: DATABASE UTAMA";
         document.getElementById("btnStartCamera").className = "btn btn-primary";
-        switchContainer.style.display = "flex";
-        switchContainer.className = "switch-container";
+        switchContainer.style.display = "flex"; switchContainer.className = "switch-container";
       }
       scannerAktif = true; window.mulaiKamera(); window.scrollTo({ top: 0, behavior: 'auto' });
     }
@@ -522,7 +484,6 @@
       else { batchC.classList.remove("active"); divM.style.display = "block"; boxM.style.display = "block"; hist.style.display = "block"; }
     };
 
-    // FUNGSI CEK BARANG NYASAR OTOMATIS SAAT PINDAI MASAL
     window.tambahKeBatch = async function(kodeData) {
       const kB = ekstrakKodeMurni(kodeData);
       if (!kB || batchSet.has(kB) || fetchingSet.has(kB)) return;
@@ -549,23 +510,16 @@
                   if (rAsal !== "" && rAsal !== "-" && rAsal !== rTujuan) {
                       window.showToast(`⚠️ Ditolak: Kode [${kB}] tercatat di ${rAsal}`);
                       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
-                      return; // STOP! Jangan masukkan ke antrean Batch
+                      return; 
                   }
               }
-          } catch (e) {
-              document.getElementById(tempId)?.remove();
-              fetchingSet.delete(kB);
-          }
+          } catch (e) { document.getElementById(tempId)?.remove(); fetchingSet.delete(kB); }
       }
 
-      batchSet.add(kB); 
-      renderBatchList();
+      batchSet.add(kB); renderBatchList();
     };
 
-    window.clearBatchItems = function() { 
-      if(batchSet.size > 0 && confirm("Konfirmasi untuk membersihkan seluruh antrean saat ini?")) { batchSet.clear(); renderBatchList(); } 
-    };
-
+    window.clearBatchItems = function() { if(batchSet.size > 0 && confirm("Konfirmasi untuk membersihkan seluruh antrean saat ini?")) { batchSet.clear(); renderBatchList(); } };
     window.hapusItemBatch = function(kodeHapus) { batchSet.delete(kodeHapus); renderBatchList(); }
 
     function renderBatchList() {
@@ -580,10 +534,8 @@
     
     window.eksekusiSimpanMassal = function() {
       if (batchSet.size === 0) return alert("Antrean masih kosong. Silakan pindai aset terlebih dahulu.");
-      
       const btnSimpan = document.getElementById("btnSimpanMassal");
       btnSimpan.disabled = true; btnSimpan.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sinkronisasi ${batchSet.size} entri...`;
-
       const arrKodes = Array.from(batchSet), actionAPI = modeAktif === 'KIR' ? "update_kir_massal" : "update_inventaris_massal";
       const payloadData = { action: actionAPI, kodes: arrKodes };
       if (modeAktif === 'KIR') payloadData.ruangan = ruanganAktif;
@@ -599,11 +551,10 @@
         btnSimpan.disabled = false; btnSimpan.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Antrean`;
         if (data.result === "success") { alert("LAPORAN PENYIMPANAN:\n\n" + data.message); arrKodes.forEach(k => memoryCache.delete(k)); batchSet.clear(); renderBatchList(); } 
         else { alert("Kesalahan Sistem: " + (data.message || "Gagal melakukan sinkronisasi data.")); }
-      }).catch(err => { 
-        btnSimpan.disabled = false; btnSimpan.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Antrean`; alert("Gangguan koneksi saat proses sinkronisasi server."); 
-      });
+      }).catch(err => { btnSimpan.disabled = false; btnSimpan.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Simpan Antrean`; alert("Gangguan koneksi saat proses sinkronisasi server."); });
     };
 
+    // FUNGSI CEK BARANG NYASAR OTOMATIS SAAT SINGLE SCAN
     window.autoSimpanSesuaiMode = function(kodeQR) {
       const kodeBersih = ekstrakKodeMurni(kodeQR);
       if (!kodeBersih) return alert("Format kode tidak valid.");
@@ -626,45 +577,14 @@
       fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
       .then(res => res.json()).then(data => { 
         if (data.result === "need_confirmation") {
-          window.pendingReallocationData = { kode: kodeBersih, ruangan: ruanganAktif, action: actionAPI };
-          document.getElementById("pesanBarangNyasar").innerText = data.message;
-          document.getElementById("modalBarangNyasar").style.display = "flex";
+          window.showToast("⚠️ Ditolak: Barang beda ruangan!");
+          alert(`DITOLAK! \n\nBarang ini tercatat di ruangan lain dan tidak dapat dipindahkan ke ruangan ${ruanganAktif.toUpperCase()} tanpa otorisasi pusat.`);
+          siapkanHalamanScanner();
           return; 
         }
         memoryCache.delete(kodeBersih); window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, data.result === "success"); 
       })
       .catch(err => { window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, false); });
-    };
-
-    window.batalPindahRuangan = function() {
-        document.getElementById("modalBarangNyasar").style.display = "none";
-        window.pendingReallocationData = null;
-        window.showToast("Dibatalkan: Barang tidak dipindahkan.");
-        siapkanHalamanScanner();
-    };
-
-    window.konfirmasiPindahRuangan = function() {
-        document.getElementById("modalBarangNyasar").style.display = "none";
-        if (!window.pendingReallocationData) return;
-
-        const { kode, ruangan, action } = window.pendingReallocationData;
-        const bodyParams = new URLSearchParams();
-        bodyParams.append("action", action);
-        bodyParams.append("kode", kode);
-        bodyParams.append("ruangan", ruangan);
-        bodyParams.append("force", "true"); 
-
-        document.getElementById("page-scanner").style.display = "none";
-        document.getElementById("page-informasi").style.display = "block";
-        document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px 10px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:36px; color:var(--warning);"></i><p style="margin-top:12px; font-weight:700; font-size:14px;">Memutasi Ruangan...</p></div>`;
-
-        fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
-        .then(res2 => res2.json()).then(data2 => { 
-            memoryCache.delete(kode); 
-            window.prosesCekDetailAset(kode, isPengurusBarang, true, data2.result === "success"); 
-        }).catch(err => { 
-            window.prosesCekDetailAset(kode, isPengurusBarang, true, false); 
-        });
     };
 
     async function prosesSinkronisasiOtomatis() {
@@ -683,11 +603,7 @@
       }
     }
 
-    window.paksaHapusAntrean = function() {
-      if(confirm("Apakah Anda yakin ingin MENGHAPUS PAKSA tumpukan antrean ini? Data scan offline tersebut tidak akan masuk ke server!")) {
-        StagingManager.clearQueue(); updateNetworkStatus();
-      }
-    };
+    window.paksaHapusAntrean = function() { if(confirm("Apakah Anda yakin ingin MENGHAPUS PAKSA tumpukan antrean ini? Data scan offline tersebut tidak akan masuk ke server!")) { StagingManager.clearQueue(); updateNetworkStatus(); } };
 
     async function updateNetworkStatus() {
       const banner = document.getElementById("networkBanner"), statusText = document.getElementById("networkStatusText"), actionBtns = document.getElementById("networkActionButtons");
@@ -742,9 +658,6 @@
           else { const isTerinventaris = (data.sudah_inventaris === true || isSuccessSave); bannerHTML = `<div style="margin-bottom:12px;text-align:center;"><span class="info-badge-status ${isTerinventaris ? 'status-good' : 'status-bad'}"><i class="fa-solid ${isTerinventaris ? 'fa-circle-check' : 'fa-clock'}"></i> ${isTerinventaris ? 'DATA MASTER: TERVERIFIKASI' : 'BELUM TERVERIFIKASI (PERIODE INI)'}</span></div>`; }
 
           let teksRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? data.ruangan_aset.toUpperCase() : "BELUM DIALOKASIKAN";
-          if (isSuccessSave && modeAktif === 'KIR' && data.ruangan_aset !== ruanganAktif.toUpperCase()) {
-            teksRuangan = ruanganAktif.toUpperCase() + " <span style='font-size:9px;'>(MUTASI BARU)</span>";
-          }
           let warnaRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? "var(--kir)" : "var(--danger)";
           let btnClass = modeAktif === 'KIR' ? 'btn-kir' : (modeAktif === 'INFO' ? 'btn-info' : 'btn-primary');
 
@@ -925,30 +838,36 @@
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
-    window.cetakStikerMassal = function (listKode) {
+    // PEMBUATAN STIKER: DESAIN BARU MENGAMBIL NAMA & TAHUN
+    window.cetakStikerMassal = async function (listKode) {
         let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
+
+        const btnCetak = document.getElementById("btnEksekusiCetak");
+        if(btnCetak) { btnCetak.disabled = true; btnCetak.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menarik Data...`; }
 
         let stikerHTML = `<!DOCTYPE html><html><head><title>Cetak Label QR</title>
         <style>
             * { box-sizing: border-box; }
             body { font-family: Arial, sans-serif; padding: 20px; margin: 0; background: #f8fafc; }
-            .print-btn-container { margin-bottom: 20px; }
+            .print-btn-container { margin-bottom: 20px; text-align: center;}
             .print-btn { padding: 10px 20px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
             .stiker-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-start; }
-            .stiker-box { background: white; border: 2px solid #000; width: 175px; text-align: center; padding: 10px; border-radius: 8px; break-inside: avoid; page-break-inside: avoid; color: #000; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+            .stiker-box { background: white; border: 2px solid #000; width: 220px; text-align: center; padding: 8px; border-radius: 8px; break-inside: avoid; page-break-inside: avoid; color: #000; }
             
             .stiker-header { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; }
             .stiker-header img { max-width: 32px; max-height: 32px; object-fit: contain; }
-            .stiker-title { font-size: 11px; font-weight: 900; line-height: 1.2; text-align: center; margin: 0; padding: 0; color: #000; }
+            .stiker-title { font-size: 10px; font-weight: 900; line-height: 1.2; text-align: center; margin: 0; padding: 0; color: #000; }
             
-            .stiker-qr { width: 110px; height: 110px; margin: 0 auto; display: block; }
-            .stiker-kode { font-size: 11px; font-family: 'Courier New', monospace; font-weight: bold; margin-top: 8px; word-break: break-all; line-height: 1.1; color: #000; }
+            .stiker-qr { width: 100px; height: 100px; margin: 0 auto; display: block; }
+            .stiker-details { margin-top: 6px; font-size: 10px; line-height: 1.3; text-align: left; border-top: 1px dashed #000; padding-top: 6px; }
+            .stiker-details div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #000; }
+            .stiker-kode { font-family: 'Courier New', monospace; font-size: 11px !important; margin-bottom: 2px; }
             
             @media print { 
                 body { padding: 0; background: white; }
                 .print-btn-container { display: none; } 
-                .stiker-box { box-shadow: none; border: 2px solid #000 !important; }
+                .stiker-box { box-shadow: none; border: 2px solid #000 !important; margin-bottom: 10px;}
                 @page { margin: 10mm; }
             }
         </style>
@@ -958,31 +877,55 @@
         </div>
         <div class="stiker-container">`;
 
-        arrayKode.forEach(kd => {
+        for (let kd of arrayKode) {
+            let namaVal = "Data tidak ditemukan";
+            let tahunVal = "-";
+            
+            try {
+                let res = await fetch(`${CONFIG.API_URL}?action=get_detail&kode=${encodeURIComponent(kd)}`);
+                let data = await res.json();
+                if (data && data.result === "found") {
+                    namaVal = data.nama || "-";
+                    tahunVal = data.tahun_perolehan || data.tahun || "-";
+                }
+            } catch (e) {
+                console.error("Gagal menarik detail aset untuk stiker", e);
+            }
+
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(kd)}`;
             stikerHTML += `
             <div class="stiker-box">
                 <div class="stiker-header">
                     <div style="display: flex; justify-content: flex-start;"><img src="logo.png" onerror="this.style.display='none'"></div>
-                    <div class="stiker-title">SI-ACEP<br>SATPOL PP</div>
+                    <div class="stiker-title">PEMERINTAH KOTA SERANG<br><span style="font-size:10px;">SATPOL PP</span></div>
                     <div style="display: flex; justify-content: flex-end;"><img src="polpp.png" onerror="this.style.display='none'"></div>
                 </div>
                 <img class="stiker-qr" src="${qrUrl}" alt="QR Code">
-                <div class="stiker-kode">${kd}</div>
+                <div class="stiker-details">
+                    <div class="stiker-kode">ID: ${kd}</div>
+                    <div>NM: ${namaVal}</div>
+                    <div>TH: ${tahunVal}</div>
+                </div>
             </div>`;
-        });
+        }
 
         stikerHTML += `</div></body></html>`;
         
+        if(btnCetak) { btnCetak.disabled = false; btnCetak.innerHTML = `<i class="fa-solid fa-print"></i> Proses Cetak`; }
+
         let printWin = window.open('', '_blank');
-        printWin.document.write(stikerHTML);
-        printWin.document.close();
+        if(printWin) {
+            printWin.document.write(stikerHTML);
+            printWin.document.close();
+        } else {
+            alert("Pop-up diblokir oleh browser. Izinkan pop-up untuk mencetak stiker.");
+        }
     };
 
-    window.eksekusiCetakStikerMassalModal = function () { 
+    window.eksekusiCetakStikerMassalModal = async function () { 
         const input = document.getElementById("inputKodesStikerMassal"); 
         if (!input || !input.value.trim()) return alert("Diperlukan minimum 1 Kode Aset."); 
-        window.cetakStikerMassal(input.value.trim()); 
+        await window.cetakStikerMassal(input.value.trim()); 
         window.closeModalCetakStikerMassal(); 
     };
 
