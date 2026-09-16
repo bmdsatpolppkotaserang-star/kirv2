@@ -40,6 +40,10 @@
     #reader__dashboard, #reader__dashboard_section, #reader__status_span { display: none !important; }
     #reader { border: 2px dashed #cbd5e1 !important; border-radius: var(--radius) !important; overflow: hidden !important; background-color: #0f172a !important; padding: 4px !important; width: 100% !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.3); }
     #reader video { object-fit: cover !important; border-radius: 12px !important; width: 100% !important; max-height: 240px !important; }
+    
+    #cameraOverlay { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(153, 27, 27, 0.95); color: white; padding: 16px 20px; border-radius: 12px; text-align: center; z-index: 100; width: 85%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 2px solid #fca5a5; backdrop-filter: blur(4px); animation: pulseWarning 0.3s ease-out; }
+    @keyframes pulseWarning { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.05); } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
     .scanner-controls { display: flex; justify-content: center; gap: 10px; margin-top: 16px; width: 100%; }
     .switch-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; padding: 12px; background: var(--primary-soft); border-radius: var(--radius); border: 1px solid #bae6fd; }
     .switch-container.kir-mode { background: var(--kir-soft); border-color: #a7f3d0; }
@@ -83,8 +87,11 @@
     .info-detail-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
     .info-item { display: flex; flex-direction: column; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
     .info-item:last-child { border-bottom: none; }
-    .info-label { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
-    .info-value { font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 2px; word-break: break-word; }
+    
+    /* WARNA KONTRAK UTAMA APLIKASI (LABEL VS ISI) */
+    .info-label { font-size: 11px; color: #1e3a8a; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+    .info-value { font-size: 14px; font-weight: 700; color: #0f172a; margin-top: 2px; word-break: break-word; }
+    
     .code-highlight { font-family: monospace; color: var(--primary); font-size: 15px; font-weight: 800; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 16px; }
     .modal-box { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
@@ -134,15 +141,6 @@
     </div>
   </div>
 
-  <div id="modalBarangNyasar" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-box" style="text-align: center;">
-      <div style="width: 56px; height: 56px; background: var(--danger-soft); color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 24px;"><i class="fa-solid fa-ban"></i></div>
-      <h3 style="margin: 0 0 6px 0; color: var(--danger); font-size: 18px; font-weight: 900;">DITOLAK!</h3>
-      <p style="margin: 0 0 20px 0; color: var(--text-muted); font-size: 14px; font-weight: 700;">Bukan Aset Ruangan Ini.</p>
-      <button type="button" onclick="document.getElementById('modalBarangNyasar').style.display='none'; siapkanHalamanScanner();" class="btn btn-dark" style="width: 100%; padding: 12px;">Kembali Memindai</button>
-    </div>
-  </div>
-
   <div id="networkBanner" class="network-banner">
     <div style="display: flex; align-items: center; gap: 6px;">
       <i class="fa-solid fa-wifi"></i> <span id="networkStatusText">Memeriksa koneksi...</span>
@@ -180,7 +178,15 @@
       </div>
 
       <div class="scanner-box">
-        <div id="reader"></div>
+        <div style="position: relative; width: 100%;">
+            <div id="cameraOverlay">
+                <i class="fa-solid fa-ban" style="font-size: 28px; margin-bottom: 8px;"></i>
+                <div style="font-size: 18px; font-weight: 900; letter-spacing: 1px; margin-bottom: 2px;">TIDAK SESUAI!</div>
+                <div style="font-size: 13px; font-weight: 600;">Bukan Aset Ruangan Ini.</div>
+            </div>
+            <div id="reader"></div>
+        </div>
+
         <div class="scanner-controls">
           <button id="btnStartCamera" type="button" class="btn btn-primary" style="flex: 1;"><i class="fa-solid fa-camera"></i> Buka Kamera</button>
           <button id="btnStopCamera" type="button" class="btn btn-danger" style="flex: 1; display: none;" onclick="window.matikanKamera()"><i class="fa-solid fa-circle-stop"></i> Tutup Kamera</button>
@@ -282,8 +288,8 @@
         <button type="button" onclick="closeModalCetakStikerMassal()" style="background: transparent; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">&times;</button>
       </div>
       <div style="margin-bottom: 16px;">
-        <label for="inputKodesStikerMassal" style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Daftar Kode (pisahkan dengan koma):</label>
-        <textarea id="inputKodesStikerMassal" class="form-control" rows="4" placeholder="Contoh: 1.3.2.01.001, 1.3.2.01.002" style="resize: vertical;"></textarea>
+        <label for="inputKodesStikerMassal" style="display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Daftar Kode (cukup tekan Enter ke bawah):</label>
+        <textarea id="inputKodesStikerMassal" class="form-control" rows="5" placeholder="Contoh:&#10;1.3.2.01.001&#10;1.3.2.01.002&#10;1.3.2.01.003" style="resize: vertical;"></textarea>
       </div>
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button type="button" onclick="closeModalCetakStikerMassal()" class="btn btn-dark" style="padding: 10px 14px; font-size: 12px; flex: 1;">Batal</button>
@@ -332,7 +338,6 @@
     let lastScanTime = 0, lastScanCode = "";
     let modeAktif = null, ruanganAktif = "";
     let isPengurusBarang = false; 
-    window.pendingReallocationData = null; 
 
     const memoryCache = new Map();
     const scanBeepSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUtvT18AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8AZv8=");
@@ -372,6 +377,17 @@
       if(!tb) { tb = document.createElement("div"); tb.id = "toastBox"; document.body.appendChild(tb); }
       tb.innerHTML = msg; tb.style.display = "block"; tb.style.opacity = "1";
       setTimeout(() => { tb.style.opacity = "0"; setTimeout(() => tb.style.display = "none", 300); }, 3500);
+    };
+
+    window.showCameraOverlayWarning = function() {
+        const overlay = document.getElementById("cameraOverlay");
+        overlay.style.display = "block";
+        if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+        scannerAktif = false; 
+        setTimeout(() => {
+            overlay.style.display = "none";
+            scannerAktif = true; 
+        }, 2500);
     };
 
     window.matikanKamera = function() {
@@ -432,7 +448,7 @@
       document.addEventListener("visibilitychange", () => { if (document.hidden) window.matikanKamera(); });
       document.getElementById("inputKodeManual")?.addEventListener("keypress", (e) => { if (e.key === "Enter") window.eksekusiCariManual(); });
       document.getElementById("btnHapusInventaris")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) window.hapusDataAset(kode); });
-      document.getElementById("btnCetakQR")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) window.cetakStikerMassal([kode]); });
+      document.getElementById("btnCetakQR")?.addEventListener("click", () => { const kode = localStorage.getItem("print_kode"); if (kode) window.cetakStikerMassal(kode); });
     });
 
     window.eksekusiCariManual = function() {
@@ -459,14 +475,14 @@
     window.pilihMode = function(mode) {
       modeAktif = mode; document.getElementById("overlayMode").style.display = "none";
       if (mode === 'KIR') { document.getElementById("overlayInputRuangan").style.display = "flex"; document.getElementById("inputNamaRuangan").focus(); } 
-      else { siapkanHalamanScanner(); }
+      else { window.siapkanHalamanScanner(); }
     };
 
     window.setRuanganAktif = function() {
       const val = document.getElementById("inputNamaRuangan").value.trim();
       if (!val) return alert("Detail ruangan tidak boleh kosong.");
       ruanganAktif = val; document.getElementById("overlayInputRuangan").style.display = "none";
-      siapkanHalamanScanner();
+      window.siapkanHalamanScanner();
     };
 
     window.resetAplikasi = function() {
@@ -479,7 +495,7 @@
       document.getElementById("teksModeAktif").innerText = "SISTEM SIAP...";
     };
 
-    function siapkanHalamanScanner() {
+    window.siapkanHalamanScanner = function() {
       document.getElementById("page-scanner").style.display = "block"; document.getElementById("page-informasi").style.display = "none";
       const judul = document.getElementById("judulScanner"), subjudul = document.getElementById("subjudulScanner");
       const headerTeks = document.getElementById("teksModeAktif"), switchContainer = document.getElementById("wrapperSwitchBatch");
@@ -521,7 +537,6 @@
       else { batchC.classList.remove("active"); divM.style.display = "block"; boxM.style.display = "block"; hist.style.display = "block"; }
     };
 
-    // MODE MASSAL - CEK BARANG BEDA RUANGAN
     window.tambahKeBatch = async function(kodeData) {
       const kB = ekstrakKodeMurni(kodeData);
       if (!kB || batchSet.has(kB) || fetchingSet.has(kB)) return;
@@ -546,8 +561,7 @@
                   const rTujuan = ruanganAktif.trim().toUpperCase();
                   
                   if (rAsal !== "" && rAsal !== "-" && rAsal !== rTujuan) {
-                      window.showToast("⚠️ Ditolak: Bukan Aset Ruangan Ini!");
-                      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+                      window.showCameraOverlayWarning(); 
                       return; 
                   }
               }
@@ -603,7 +617,6 @@
       });
     };
 
-    // MODE TUNGGAL (SATU SATU) - CEK BARANG BEDA RUANGAN
     window.autoSimpanSesuaiMode = function(kodeQR) {
       const kodeBersih = ekstrakKodeMurni(kodeQR);
       if (!kodeBersih) return alert("Format kode tidak valid.");
@@ -626,44 +639,13 @@
       fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
       .then(res => res.json()).then(data => { 
         if (data.result === "need_confirmation") {
-          window.showToast("⚠️ Ditolak: Bukan Aset Ruangan Ini!");
-          document.getElementById("modalBarangNyasar").style.display = "flex";
+          window.siapkanHalamanScanner(); 
+          window.showCameraOverlayWarning(); 
           return; 
         }
         memoryCache.delete(kodeBersih); window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, data.result === "success"); 
       })
       .catch(err => { window.prosesCekDetailAset(kodeBersih, isPengurusBarang, true, false); });
-    };
-
-    window.batalPindahRuangan = function() {
-        document.getElementById("modalBarangNyasar").style.display = "none";
-        window.pendingReallocationData = null;
-        window.showToast("Dibatalkan: Barang tidak dipindahkan.");
-        siapkanHalamanScanner();
-    };
-
-    window.konfirmasiPindahRuangan = function() {
-        document.getElementById("modalBarangNyasar").style.display = "none";
-        if (!window.pendingReallocationData) return;
-
-        const { kode, ruangan, action } = window.pendingReallocationData;
-        const bodyParams = new URLSearchParams();
-        bodyParams.append("action", action);
-        bodyParams.append("kode", kode);
-        bodyParams.append("ruangan", ruangan);
-        bodyParams.append("force", "true"); 
-
-        document.getElementById("page-scanner").style.display = "none";
-        document.getElementById("page-informasi").style.display = "block";
-        document.getElementById("infoDetailAset").innerHTML = `<div style="text-align:center; padding: 24px 10px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:36px; color:var(--warning);"></i><p style="margin-top:12px; font-weight:700; font-size:14px;">Memutasi Ruangan...</p></div>`;
-
-        fetch(CONFIG.API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: bodyParams.toString() })
-        .then(res2 => res2.json()).then(data2 => { 
-            memoryCache.delete(kode); 
-            window.prosesCekDetailAset(kode, isPengurusBarang, true, data2.result === "success"); 
-        }).catch(err => { 
-            window.prosesCekDetailAset(kode, isPengurusBarang, true, false); 
-        });
     };
 
     async function prosesSinkronisasiOtomatis() {
@@ -708,7 +690,7 @@
     }
     function triggerSuccessFeedback() { try { scanBeepSound.currentTime = 0; scanBeepSound.volume = 1.0; scanBeepSound.play().catch(() => {}); } catch (e) {} if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]); }
     async function toggleFlashlight() { if (html5QrCode && html5QrCode.isScanning) { try { isTorchOn = !isTorchOn; await html5QrCode.applyVideoConstraints({ advanced: [{ torch: isTorchOn }] }); document.getElementById("btnTorch").classList.toggle("btn-warning", !isTorchOn); document.getElementById("btnTorch").classList.toggle("btn-primary", isTorchOn); } catch (e) { alert("Senter tidak didukung pada perangkat ini."); } } }
-    window.tampilkanHalamanScanner = function () { siapkanHalamanScanner(); };
+    window.tampilkanHalamanScanner = function () { window.siapkanHalamanScanner(); };
     window.tampilkanHalamanInformasi = function () { document.getElementById("page-scanner").style.display = "none"; document.getElementById("page-informasi").style.display = "block"; window.scrollTo({ top: 0, behavior: 'auto' }); };
 
     function saveToHistory(kode, nama) {
@@ -747,17 +729,29 @@
           let warnaRuangan = data.ruangan_aset && data.ruangan_aset !== "-" ? "var(--kir)" : "var(--danger)";
           let btnClass = modeAktif === 'KIR' ? 'btn-kir' : (modeAktif === 'INFO' ? 'btn-info' : 'btn-primary');
 
+          // PENGECEKAN KENDARAAN (NOPOL, RANGKA, MESIN) - MUNCUL OTOMATIS JIKA ADA DATANYA
+          let vehicleDetailsHTML = "";
+          if ((data.polisi && data.polisi !== "-" && data.polisi !== "") || 
+              (data.rangka && data.rangka !== "-" && data.rangka !== "") || 
+              (data.mesin && data.mesin !== "-" && data.mesin !== "")) {
+            vehicleDetailsHTML = `
+            <div class="info-item"><span class="info-label">NOMOR POLISI (NOPOL)</span><span class="info-value" style="color: var(--primary);">${safeStr(data.polisi)}</span></div>
+            <div class="info-item"><span class="info-label">NOMOR RANGKA</span><span class="info-value" style="font-family: monospace; font-size: 13px;">${safeStr(data.rangka)}</span></div>
+            <div class="info-item"><span class="info-label">NOMOR MESIN</span><span class="info-value" style="font-family: monospace; font-size: 13px;">${safeStr(data.mesin)}</span></div>`;
+          }
+
           infoDetailAset.innerHTML = `${bannerHTML}
           <div class="info-detail-grid">
             <div class="info-item"><span class="info-label">IDENTITAS (KODE / REG)</span><span class="info-value code-highlight">${safeStr(data.kode)} <span style="font-size:12px;color:var(--text-muted);">(Reg: ${safeStr(data.reg)})</span></span></div>
             <div class="info-item"><span class="info-label">NAMA ASET / MERK</span><span class="info-value">${safeStr(data.nama)} ${data.merk && data.merk !== '-' ? ' - ' + data.merk : ''}</span></div>
             <div class="info-item"><span class="info-label">SPESIFIKASI & TAHUN</span><span class="info-value">Ukuran: ${safeStr(data.ukuran)} | Bahan: ${safeStr(data.bahan)} | Tahun: ${safeStr(data.tahun_perolehan || data.tahun)}</span></div>
+            ${vehicleDetailsHTML}
             <div class="info-item"><span class="info-label">KONDISI & STATUS</span><span class="info-value">${safeStr(data.kondisi_status)} (Status: ${safeStr(data.status_aset)})</span></div>
             <div class="info-item"><span class="info-label">ALOKASI RUANGAN TERAKHIR</span><span class="info-value" style="color: ${warnaRuangan}; font-weight: 800;"><i class="fa-solid fa-location-dot"></i> ${teksRuangan}</span></div>
             <div class="info-item" style="background-color: ${tampilkanHarga ? 'var(--success-soft)' : 'transparent'}; padding: 6px; border-radius: 8px;"><span class="info-label">NILAI ASET</span><span class="info-value" style="color: #065f46;">${teksHarga}</span></div>
           </div>
-          <div style="margin-top: 16px;"><button type="button" onclick="siapkanHalamanScanner()" class="btn ${btnClass}" style="width: 100%;"><i class="fa-solid fa-arrow-left"></i> Pindai Berikutnya</button></div>`;
-        } else { infoDetailAset.innerHTML = `<div style="text-align:center; color:var(--danger); padding:16px 10px;"><i class="fa-solid fa-circle-xmark" style="font-size:36px;"></i><p style="margin-top:10px; font-weight:700; font-size:14px;">Entri tidak ditemukan: [${kodeBersih}]</p><button type="button" onclick="siapkanHalamanScanner()" class="btn btn-dark" style="margin-top: 12px;"><i class="fa-solid fa-arrow-left"></i> Cari Kembali</button></div>`; }
+          <div style="margin-top: 16px;"><button type="button" onclick="window.siapkanHalamanScanner()" class="btn ${btnClass}" style="width: 100%;"><i class="fa-solid fa-arrow-left"></i> Pindai Berikutnya</button></div>`;
+        } else { infoDetailAset.innerHTML = `<div style="text-align:center; color:var(--danger); padding:16px 10px;"><i class="fa-solid fa-circle-xmark" style="font-size:36px;"></i><p style="margin-top:10px; font-weight:700; font-size:14px;">Entri tidak ditemukan: [${kodeBersih}]</p><button type="button" onclick="window.siapkanHalamanScanner()" class="btn btn-dark" style="margin-top: 12px;"><i class="fa-solid fa-arrow-left"></i> Cari Kembali</button></div>`; }
       }
       if (!forceRefresh && memoryCache.has(kodeBersih)) { renderDetailUI(memoryCache.get(kodeBersih)); return; }
       showSkeletonLoading();
@@ -924,9 +918,14 @@
     window.openModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "flex"; const kodeAktif = localStorage.getItem("print_kode"); if (kodeAktif) document.getElementById("inputKodesStikerMassal").value = kodeAktif; };
     window.closeModalCetakStikerMassal = function () { document.getElementById("modalCetakStikerMassal").style.display = "none"; };
     
-    // PEMBUATAN STIKER: KODE BARANG SATU BARIS (NO WRAP)
     window.cetakStikerMassal = async function (listKode) {
-        let arrayKode = Array.isArray(listKode) ? listKode : (typeof listKode === "string" ? listKode.split(",").map(k => k.trim()).filter(Boolean) : []);
+        let arrayKode = [];
+        if (Array.isArray(listKode)) {
+            arrayKode = listKode;
+        } else if (typeof listKode === "string") {
+            arrayKode = listKode.split(/[\r\n,]+/).map(k => k.trim()).filter(Boolean);
+        }
+
         if (arrayKode.length === 0) return alert("Diperlukan minimum 1 Kode Aset.");
 
         const btnCetak = document.getElementById("btnEksekusiCetak");
@@ -974,10 +973,11 @@
             
             .stiker-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-width: 0; }
             .detail-group { display: flex; flex-direction: column; line-height: 1.2;}
-            .detail-label { font-size: 7px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 1px;}
-            .detail-value { font-size: 11px; font-weight: 800; color: #0f172a; word-break: break-word; }
             
-            /* KODE BARANG DIPAKSA 1 BARIS & UKURAN DIPERKECIL */
+            /* WARNA KONTRAK PADA LABEL STIKER (KODE BARANG, NAMA BARANG, TAHUN) */
+            .detail-label { font-size: 7.5px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; margin-bottom: 1px; letter-spacing: 0.5px;}
+            .detail-value { font-size: 11px; font-weight: 800; color: #000000; word-break: break-word; }
+            
             .value-kode { 
                 border: 1px dashed #94a3b8; 
                 padding: 3px 4px; 
@@ -986,6 +986,7 @@
                 font-size: 7.5px; 
                 font-weight: 900; 
                 background: #f8fafc; 
+                color: #000000;
                 white-space: nowrap; 
                 overflow: hidden; 
             }
